@@ -14,6 +14,15 @@ type Scheduler struct {
 }
 
 // Call to create a scheduler with the callback function to use
+//
+// The callback function is technically becoming recursive so things like
+//
+//	var counter int
+//	func callback() {
+//		counter++
+//	}()
+//
+// can be used and will retain their state
 func NewScheduler(callback func()) *Scheduler {
 	return &Scheduler{
 		intervalChan: make(chan time.Duration),
