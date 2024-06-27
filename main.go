@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/kardianos/service"
 	"github.com/kociumba/Kopycat/controller"
+	"github.com/kociumba/Kopycat/gui"
 	"github.com/kociumba/Kopycat/handlers"
 	"github.com/kociumba/Kopycat/scheduler"
 )
@@ -17,6 +18,8 @@ var logger service.Logger
 type program struct {
 	exit chan struct{}
 }
+
+var guiServer *gui.GUIServer
 
 var s = scheduler.NewScheduler(func() {
 	handlers.CheckDirs()
@@ -40,16 +43,28 @@ func (p *program) run() {
 	logger.Infof("Running as %v.", service.Platform())
 	// Do work here
 
+	//Always call first to init the file logger
 	handlers.SetupCheck()
 
 	s.Start()
 	s.ChangeInterval(time.Second * 2) // Change interval to 1 second
+
+	//Do not call this first or logs will get fucked
+	guiServer = gui.NewGUIServer("42069")
+
+	// logger.Error(guiServer.Start())
+	guiServer.Start()
 }
 
 func (p *program) Stop(service service.Service) error {
 	// Stop should not block. Return with a few seconds.
 	s.Stop()
 	service.Stop()
+
+	err := guiServer.Stop()
+	if err != nil {
+		logger.Error(err)
+	}
 
 	logger.Info("Stopping Service!")
 	close(p.exit)
@@ -59,6 +74,7 @@ func (p *program) Stop(service service.Service) error {
 func main() {
 
 	svcFlag := flag.String("service", "", "Control the system service.")
+	// serverflag := flag.String("port", "", "Port to start the server.")
 	flag.Parse()
 
 	options := make(service.KeyValue)

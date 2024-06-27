@@ -10,7 +10,7 @@ import (
 var (
 	executable string
 	logFile    *os.File
-	clog       *log.Logger
+	Clog       *log.Logger
 	counter    int
 	err        error
 )
@@ -18,17 +18,19 @@ var (
 func CheckDirs() {
 	// TODO: the actuall dir syncing logic
 	if counter == 0 {
-		clog.Print("\n\n")
-		clog.Info("Service started with", "pid", os.Getpid())
+		// Clog.Print("\n\n")
+		Clog.Info("Service started with", "pid", os.Getpid())
 	}
 
-	clog.Info("Check scheduled", "log", logFile.Name(), "call", counter)
+	if counter%25 == 0 {
+		Clog.Info("Check scheduled", "log", logFile.Name(), "call", counter)
+	}
 
 	counter++
 }
 
 // Set up the logger and log file relative to the executable
-func SetupCheck() {
+func SetupCheck() *log.Logger {
 	log.SetReportCaller(true)
 
 	executable, err = os.Executable()
@@ -55,10 +57,12 @@ func SetupCheck() {
 	}
 
 	// Initialize the logger with the file output
-	clog = log.New(logFile)
-	clog.SetReportTimestamp(true)
-	clog.SetTimeFormat("2006-01-02 15:04:05")
-	clog.SetReportCaller(true)
+	Clog = log.New(logFile)
+	Clog.SetReportTimestamp(true)
+	Clog.SetTimeFormat("2006-01-02 15:04:05")
+	Clog.SetReportCaller(true)
 
 	log.Info("Logging to", "path", logPath)
+
+	return Clog
 }

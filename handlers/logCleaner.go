@@ -16,7 +16,7 @@ import (
 
 const (
 	// logRetentionPeriod = 1 * 24 * time.Hour // Retain logs for 1 day
-	logRetentionPeriod = 12 * time.Hour // testing times
+	logRetentionPeriod = 10 * time.Minute // testing times
 	dateTimeFormat     = "2006-01-02 15:04:05"
 )
 
