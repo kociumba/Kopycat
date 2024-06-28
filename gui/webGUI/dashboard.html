@@ -14,17 +14,16 @@
 
     <script>
         let selectedFolderPath = '';
-        let selectedDrive = '';
 
         function submitFiles() {
             var filePath = $('#filePath').val();
-            var checkedDrive = $('input[type="radio"][name="drives-option"]:checked', '#drives-list').val();
+            var checkedDrive = $('input[name="drives-option"]:checked').val();
 
             console.log('File Path:', filePath);
             console.log('Checked Drive:', checkedDrive);
 
-            if (!selectedDrive) {
-                console.error('No drive selected', selectedDrive);
+            if (!checkedDrive) {
+                console.error('No drive selected', checkedDrive);
                 alert('Please select a drive.');
                 return;
             }
@@ -40,10 +39,10 @@
                 type: 'POST',
                 url: '/add-folder',
                 contentType: 'application/json',
-                data: JSON.stringify({ drive: selectedDrive, folderPath: filePath }),
+                data: JSON.stringify({ drive: checkedDrive, folderPath: filePath }),
                 success: function (response) {
                     console.log('Full path from backend:', response.fullPath);
-                    alert('Folder path resolved: ' + response.fullPath);
+                    alert('Folder added to sync: ' + response.fullPath);
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.error('Error resolving folder path:', textStatus, errorThrown);
@@ -52,12 +51,6 @@
                 }
             });
         }
-
-        $(document).on('change', '#drive-template input[type="radio"]', function() {
-            const checkedRadio = $('input[type="radio"][name="drives-option"]:checked', '#drives-list');
-            selectedDrive = checkedRadio.val();
-            console.log('Checked Drive:', selectedDrive);
-        });
     </script>
 
     <body>

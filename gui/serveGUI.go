@@ -177,7 +177,7 @@ func (s *GUIServer) returnSystemDrives(w http.ResponseWriter, r *http.Request) {
 	tmpl := `
 		{{range .Drives}}
 		<div class="drive">
-			<input type="radio" name="base-dir" value="{{.}}"><span>{{.}}</span>
+			<input type="radio" name="drives-option" value="{{.}}"><span>{{.}}</span>
 		</div>
 		{{end}}
 	`
