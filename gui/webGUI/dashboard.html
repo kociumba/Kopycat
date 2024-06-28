@@ -4,13 +4,66 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>File Sync App</title>
+        <meta name="description" content="The web interface for Kopycat">
+        <meta name="author" content="kociumba">
+        <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <title>Kopycat</title>
     </head>
+
+
+    <script>
+        let selectedFolderPath = '';
+        let selectedDrive = '';
+
+        function submitFiles() {
+            var filePath = $('#filePath').val();
+            var checkedDrive = $('input[type="radio"][name="drives-option"]:checked', '#drives-list').val();
+
+            console.log('File Path:', filePath);
+            console.log('Checked Drive:', checkedDrive);
+
+            if (!selectedDrive) {
+                console.error('No drive selected', selectedDrive);
+                alert('Please select a drive.');
+                return;
+            }
+
+            if (!filePath) {
+                console.error('No file path entered');
+                alert('Please enter a folder path.');
+                return;
+            }
+
+            // Send the drive and filePath to the backend
+            $.ajax({
+                type: 'POST',
+                url: '/add-folder',
+                contentType: 'application/json',
+                data: JSON.stringify({ drive: selectedDrive, folderPath: filePath }),
+                success: function (response) {
+                    console.log('Full path from backend:', response.fullPath);
+                    alert('Folder path resolved: ' + response.fullPath);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Error resolving folder path:', textStatus, errorThrown);
+                    console.log('Response:', jqXHR.responseText);
+                    alert('Error resolving folder path: ' + textStatus);
+                }
+            });
+        }
+
+        $(document).on('change', '#drive-template input[type="radio"]', function() {
+            const checkedRadio = $('input[type="radio"][name="drives-option"]:checked', '#drives-list');
+            selectedDrive = checkedRadio.val();
+            console.log('Checked Drive:', selectedDrive);
+        });
+    </script>
 
     <body>
         <div class="container">
             <header>
-                <h1>File Sync App</h1>
+                <h1>Kopycat Dashboard</h1>
             </header>
             <main>
                 <section class="status">
@@ -22,12 +75,28 @@
                 </section>
                 <section class="folders">
                     <h2>Synced Folders</h2>
-                    <ul>
-                        <li>Documents</li>
-                        <li>Pictures</li>
-                        <li>Music</li>
-                    </ul>
-                    <button id="add-folder">Add Folder</button>
+                    <div hx-target="#synced-folders-list">
+                        <!-- <form hx-post="/add-sync">
+                            <label for="files" class="button">Select files:</label>
+                            <input type="file" id="files" name="files" multiple style="display: none;"><br><br>
+                            <input type="submit" class="button">
+                          </form> -->
+                        <div id="drives-list" hx-get="/get-system-drives" hx-trigger="load">
+                        </div>
+                        <template id="drive-template">
+                            <div class="drive">
+                                <input type="radio" name="drives-option" value="{{.}}" id="{{.}}"><span>{{.}}</span>
+                            </div>
+                        </template>
+                        <label for="filePath">Enter Full Directory Path:</label>
+                        <input type="text" id="filePath" placeholder="root/users/username/sync">
+
+                        <!-- <a class="button" onclick="openFile()">Add files to sync</a> -->
+                        <a class="button" onclick="submitFiles()">Update Sync</a>
+                    </div>
+                    <div id="synced-folders-list">
+                        <!-- This is where the updated list of synced folders will be displayed -->
+                    </div>
                 </section>
                 <section class="settings">
                     <h2>Settings</h2>
@@ -47,7 +116,7 @@
                 </section>
             </main>
             <footer>
-                <p>&copy; 2024 File Sync App</p>
+                <p>&copy; 2024 Kopycat</p>
             </footer>
         </div>
     </body>
@@ -55,6 +124,10 @@
     </html>
 
     <style>
+        :root {
+            --radius: 0.25rem;
+        }
+
         html,
         body {
             height: 100%;
@@ -95,7 +168,7 @@
 
         main {
             flex-grow: 1;
-            overflow-y: auto;
+            overflow: hidden;
             padding: 20px 0;
         }
 
@@ -109,7 +182,7 @@
         }
 
         h2 {
-            color: #4CAF50;
+            color: #ffffff;
             border-bottom: 1px solid #4CAF50;
             padding-bottom: 10px;
         }
@@ -118,7 +191,7 @@
             width: 100%;
             background-color: #444444;
             padding: 3px;
-            border-radius: 3px;
+            border-radius: --radius;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
@@ -126,7 +199,7 @@
             display: block;
             height: 22px;
             background-color: #4CAF50;
-            border-radius: 3px;
+            border-radius: --radius;
             transition: width 500ms ease-in-out;
         }
 
@@ -141,17 +214,18 @@
             margin-bottom: 5px;
         }
 
-        button {
+        .button {
             display: inline-block;
             padding: 10px 20px;
             background: #4CAF50;
             color: #ffffff;
             border: none;
+            border-radius: --radius;
             cursor: pointer;
         }
 
-        button:hover {
-            background: #3a7fcf;
+        .button:hover {
+            background: #58cf3a;
         }
 
         select {
@@ -168,8 +242,6 @@
 
         /* Additional styles for better contrast */
         #sync-status span,
-        h2,
-        .button,
         .select {
             color: #4CAF50;
         }
@@ -191,4 +263,3 @@
             background: #45a049;
         }
     </style>
-    
