@@ -26,11 +26,15 @@ func CheckDirs() {
 		Clog.Info("Check scheduled", "log", logFile.Name(), "call", counter)
 	}
 
+	//TODO: check sync folders for changes
+	// get sha256 of files or folders and comapre to last time
+	// if different then sync
+
 	counter++
 }
 
 // Set up the logger and log file relative to the executable
-func SetupCheck() *log.Logger {
+func Setup() *log.Logger {
 	log.SetReportCaller(true)
 
 	executable, err = os.Executable()

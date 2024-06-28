@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/kardianos/service"
+	"github.com/kociumba/Kopycat/config"
 	"github.com/kociumba/Kopycat/controller"
 	"github.com/kociumba/Kopycat/gui"
 	"github.com/kociumba/Kopycat/handlers"
@@ -44,7 +45,9 @@ func (p *program) run() {
 	// Do work here
 
 	//Always call first to init the file logger
-	handlers.SetupCheck()
+	handlers.Setup()
+
+	config.ReadConfig()
 
 	s.Start()
 	s.ChangeInterval(time.Second * 2) // Change interval to 1 second
