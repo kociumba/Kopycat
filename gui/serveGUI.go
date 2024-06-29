@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/charmbracelet/log"
+	"github.com/kociumba/Kopycat/config"
 	h "github.com/kociumba/Kopycat/handlers"
 )
 
@@ -73,6 +74,7 @@ func (s *GUIServer) Start() error {
 
 	s.mux.HandleFunc("/add-folder", s.handleAddFolder)
 	s.mux.HandleFunc("/get-system-drives", s.returnSystemDrives)
+	s.mux.HandleFunc("/get-sync-targets", s.returnSyncTargets)
 
 	s.wg.Add(1)
 	go func() {
@@ -114,6 +116,9 @@ func (s *GUIServer) Stop() error {
 	return nil
 }
 
+// DEPRECATED
+//
+// TODO: remove
 func (s *GUIServer) returnSystemDrives(w http.ResponseWriter, r *http.Request) {
 	drives, err := h.GetSystemDrives()
 	if err != nil {
@@ -139,6 +144,43 @@ func (s *GUIServer) returnSystemDrives(w http.ResponseWriter, r *http.Request) {
 	data := SystemDriveResponse{Drives: drives}
 	var sb strings.Builder
 	err = t.Execute(&sb, data)
+	if err != nil {
+		h.Clog.Error("Error executing template", "error", err)
+		http.Error(w, "Error executing template", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	w.Write([]byte(sb.String()))
+}
+
+func (s *GUIServer) returnSyncTargets(w http.ResponseWriter, r *http.Request) {
+	data := config.NewSyncConfig()
+	data.ReadConfig()
+
+	targets := data.ReturnTargets()
+
+	tmpl := `
+	{{range .}}
+		<div class="targets">
+			<span>{{.PathOrigin}} -> {{.PathDestination}}
+			<button class="button" onclick="deleteTarget('{{.PathOrigin}}', '{{.PathDestination}}')">Delete</button>
+			</span>
+		</div>
+	{{end}}
+	`
+
+	t, err := template.New("sync").Parse(tmpl)
+	if err != nil {
+		h.Clog.Error("Error parsing template", "error", err)
+		http.Error(w, "Error parsing template", http.StatusInternalServerError)
+		return
+	}
+
+	h.Clog.Info("Targets:", "targets", targets)
+
+	var sb strings.Builder
+	err = t.Execute(&sb, targets)
 	if err != nil {
 		h.Clog.Error("Error executing template", "error", err)
 		http.Error(w, "Error executing template", http.StatusInternalServerError)

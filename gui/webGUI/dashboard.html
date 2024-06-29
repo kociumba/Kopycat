@@ -52,6 +52,11 @@
                 }
             });
         }
+
+        function deleteTarget(pathOrigin, pathDestination) {
+            // Implement your delete logic here
+            console.log("Delete target:", pathOrigin, "->", pathDestination);
+        }
     </script>
 
     <body>
@@ -90,8 +95,10 @@
                         <!-- <a class="button" onclick="openFile()">Add files to sync</a> -->
                         <a class="button" onclick="submitFiles()">Update Sync</a>
                     </div>
-                    <div id="synced-folders-list">
-                        <!-- This is where the updated list of synced folders will be displayed -->
+                    <h2>Manage Sync Targets</h2>
+                    <div id="targets-container" hx-get="/get-sync-targets" hx-trigger="load"
+                        hx-target="#targets-container">
+                        <!-- The targets will be loaded here -->
                     </div>
                 </section>
                 <section class="settings">
@@ -120,6 +127,9 @@
     </html>
 
     <style>
+
+        @import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
+
         :root {
             --radius: 0.25rem;
         }
@@ -130,7 +140,7 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            font-family: Arial, sans-serif;
+            font-family: Poppins, sans-serif;
             line-height: 1.6;
             background-color: #1a1a1a;
             color: #e0e0e0;

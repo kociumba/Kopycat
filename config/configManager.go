@@ -1,27 +1,20 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/abusomani/jsonhandlers"
 	"github.com/charmbracelet/log"
 
 	h "github.com/kociumba/Kopycat/handlers"
 )
 
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// =-  N E E D   D I F F E R E N T   C O N F I G  -=
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
 type SyncConfig struct {
 	Interval time.Duration `json:"interval"`
-	Targets  []struct {
-		Target Target `json:"target"`
-	} `json:"targets"`
-	cfg jsonhandlers.JSONHandler
+	Targets  []Target      `json:"targets"`
 }
 
 type Target struct {
@@ -35,24 +28,33 @@ var (
 )
 
 func NewSyncConfig() *SyncConfig {
-	configPath, _ := GetRelativePath()
-	cfg := jsonhandlers.New(jsonhandlers.WithFileHandler(configPath))
-	return &SyncConfig{
-		cfg: *cfg.SetOptions(jsonhandlers.WithFileHandler(configPath)),
-	}
+	// configPath, _ := GetRelativePath()
+	return &SyncConfig{}
 }
 
 func (c *SyncConfig) AddToSync(PathOrigin, PathDestination string) {
 	log.Info("Adding to sync", "origin", PathOrigin, "destination", PathDestination)
 
-	ServerConfig.Targets = append(ServerConfig.Targets, struct {
-		Target Target `json:"target"`
-	}{
-		Target: Target{
-			PathOrigin:      PathOrigin,
-			PathDestination: PathDestination,
-		},
+	ServerConfig.Targets = append(ServerConfig.Targets, Target{
+		PathOrigin:      PathOrigin,
+		PathDestination: PathDestination,
 	})
+
+	err := c.SaveConfig()
+	if err != nil {
+		h.Clog.Error(err)
+	}
+}
+
+func (c *SyncConfig) RemoveFromSync(PathOrigin, PathDestination string) {
+	log.Info("Removing from sync", "origin", PathOrigin, "destination", PathDestination)
+
+	for i, target := range ServerConfig.Targets {
+		if target.PathOrigin == PathOrigin && target.PathDestination == PathDestination {
+			ServerConfig.Targets = append(ServerConfig.Targets[:i], ServerConfig.Targets[i+1:]...)
+			break
+		}
+	}
 
 	err := c.SaveConfig()
 	if err != nil {
@@ -77,18 +79,36 @@ func (c *SyncConfig) ReadConfig() {
 	configPath, configDir := GetRelativePath()
 	log.Info("Reading config at", "path", configPath)
 
-	err := c.cfg.Unmarshal(&ServerConfig)
+	file, err := os.Open(configPath)
 	if err != nil {
 		h.Clog.Warn("Failed to read config file", "error", err)
 		if attemptCreateConfig {
 			h.Clog.Info("Failed to read config, check logs and relaunch the application")
 		} else {
+			*c = SyncConfig{}
 			c.CreateConfig(configPath, configDir)
+			ServerConfig = *c
 		}
 		return
 	}
+	defer file.Close()
+
+	err = json.NewDecoder(file).Decode(&ServerConfig)
+	if err != nil {
+		h.Clog.Error(err)
+	}
+
+	*c = ServerConfig
 
 	h.Clog.Info(ServerConfig)
+}
+
+func (c *SyncConfig) ReturnTargets() []Target {
+	return c.Targets
+}
+
+func (c *SyncConfig) ReturnInterval() time.Duration {
+	return c.Interval
 }
 
 func (c *SyncConfig) CreateConfig(configPath, configDir string) {
@@ -101,18 +121,16 @@ func (c *SyncConfig) CreateConfig(configPath, configDir string) {
 		return
 	}
 
-	f, err := os.Create(configPath)
+	file, err := os.Create(configPath)
 	if err != nil {
 		h.Clog.Error(err)
 		return
 	}
-	f.Close()
+	defer file.Close()
 
 	ServerConfig = SyncConfig{
 		Interval: 60 * time.Second,
-		Targets: []struct {
-			Target Target `json:"target"`
-		}{},
+		Targets:  []Target{},
 	}
 
 	err = c.SaveConfig()
@@ -128,8 +146,16 @@ func (c *SyncConfig) SaveConfig() error {
 		return fmt.Errorf("SyncConfig is nil")
 	}
 
+	configPath, _ := GetRelativePath()
+
 	h.Clog.Info("Saving config")
-	err := c.cfg.Marshal(&ServerConfig)
+	file, err := os.Create(configPath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	err = json.NewEncoder(file).Encode(&ServerConfig)
 	if err != nil {
 		return err
 	}
