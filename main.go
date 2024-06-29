@@ -22,6 +22,7 @@ type program struct {
 
 var guiServer *gui.GUIServer
 
+// Determines what the scheduler does on each interval
 var s = scheduler.NewScheduler(func() {
 	handlers.CheckDirs()
 })
@@ -47,7 +48,8 @@ func (p *program) run() {
 	//Always call first to init the file logger
 	handlers.Setup()
 
-	config.ReadConfig()
+	configManager := config.NewSyncConfig()
+	configManager.ReadConfig()
 
 	s.Start()
 	s.ChangeInterval(time.Second * 2) // Change interval to 1 second

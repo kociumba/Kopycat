@@ -3,17 +3,13 @@ package gui
 import (
 	"context"
 	"embed"
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strings"
 	"sync"
 
 	"github.com/charmbracelet/log"
-	"github.com/kociumba/Kopycat/config"
 	h "github.com/kociumba/Kopycat/handlers"
 )
 
@@ -28,8 +24,8 @@ type GUIServer struct {
 }
 
 type AddFolderRequest struct {
-	FolderPath string `json:"folderPath"`
-	Drive      string `json:"drive"`
+	Origin      string `json:"origin"`
+	Destination string `json:"destination"`
 }
 
 type FolderPathResponse struct {
@@ -116,54 +112,6 @@ func (s *GUIServer) Stop() error {
 	log.Info("GUI server stopped.")
 	h.Clog.Info("GUI server stopped gracefully.", "at", s.server.Addr)
 	return nil
-}
-
-func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
-	var req AddFolderRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	h.Clog.Info("Received add folder request", "drive", req.Drive, "path", req.FolderPath)
-
-	// Clean the input paths
-	req.FolderPath = filepath.Clean(req.FolderPath)
-	req.Drive = filepath.Clean(req.Drive)
-
-	// Construct the full path
-	fullPath := filepath.Join(req.Drive, req.FolderPath)
-
-	h.Clog.Info("Constructed full path", "fullPath", fullPath)
-
-	// Check if the full path exists and is a directory
-	info, err := os.Stat(fullPath)
-	if os.IsNotExist(err) {
-		h.Clog.Error("Folder not found", "path", fullPath)
-		http.Error(w, "Folder not found", http.StatusNotFound)
-		return
-	}
-	if err != nil {
-		h.Clog.Error("Error stating folder path", "error", err)
-		http.Error(w, "Error stating folder path", http.StatusInternalServerError)
-		return
-	}
-	if !info.IsDir() {
-		h.Clog.Error("Path is not a folder", "path", fullPath)
-		http.Error(w, "Path is not a folder", http.StatusBadRequest)
-		return
-	}
-
-	// Add the folder to sync
-	config.AddToSync(fullPath)
-
-	// Prepare and send the response
-	res := FolderPathResponse{FullPath: fullPath}
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(res); err != nil {
-		h.Clog.Error("Error encoding response", "error", err)
-		http.Error(w, "Error encoding response", http.StatusInternalServerError)
-	}
 }
 
 func (s *GUIServer) returnSystemDrives(w http.ResponseWriter, r *http.Request) {

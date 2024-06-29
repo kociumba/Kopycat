@@ -16,21 +16,22 @@
         let selectedFolderPath = '';
 
         function submitFiles() {
-            var filePath = $('#filePath').val();
-            var checkedDrive = $('input[name="drives-option"]:checked').val();
+            var originPath = $('#originPath').val();
+            var destinationPath = $('#destinationPath').val();
+            // var checkedDrive = $('input[name="drives-option"]:checked').val();
 
-            console.log('File Path:', filePath);
-            console.log('Checked Drive:', checkedDrive);
+            console.log('File Path:', "originPath: ", originPath, ", destinationPath: ", destinationPath);
+            // console.log('Checked Drive:', checkedDrive);
 
-            if (!checkedDrive) {
-                console.error('No drive selected', checkedDrive);
-                alert('Please select a drive.');
-                return;
-            }
+            // if (!checkedDrive) {
+            //     console.error('No drive selected', checkedDrive);
+            //     alert('Please select a drive.');
+            //     return;
+            // }
 
-            if (!filePath) {
-                console.error('No file path entered');
-                alert('Please enter a folder path.');
+            if (!originPath) {
+                console.error('No origin path entered');
+                alert('Please enter an origin path.');
                 return;
             }
 
@@ -39,7 +40,7 @@
                 type: 'POST',
                 url: '/add-folder',
                 contentType: 'application/json',
-                data: JSON.stringify({ drive: checkedDrive, folderPath: filePath }),
+                data: JSON.stringify({ origin: originPath, destination: destinationPath }),
                 success: function (response) {
                     console.log('Full path from backend:', response.fullPath);
                     alert('Folder added to sync: ' + response.fullPath);
@@ -74,15 +75,17 @@
                             <input type="file" id="files" name="files" multiple style="display: none;"><br><br>
                             <input type="submit" class="button">
                           </form> -->
-                        <div id="drives-list" hx-get="/get-system-drives" hx-trigger="load">
+                        <!-- <div id="drives-list" hx-get="/get-system-drives" hx-trigger="load">
                         </div>
                         <template id="drive-template">
                             <div class="drive">
                                 <input type="radio" name="drives-option" value="{{.}}" id="{{.}}"><span>{{.}}</span>
                             </div>
-                        </template>
-                        <label for="filePath">Enter Full Directory Path:</label>
-                        <input type="text" id="filePath" placeholder="root/users/username/sync">
+                        </template> -->
+                        <label for="originPath">Enter Origin Folder Path:</label>
+                        <input type="text" id="originPath" placeholder="root/users/username/origin"><br>
+                        <label for="destinationPath">Enter Destination Folder Path:</label>
+                        <input type="text" id="destinationPath" placeholder="root/users/username/destination">
 
                         <!-- <a class="button" onclick="openFile()">Add files to sync</a> -->
                         <a class="button" onclick="submitFiles()">Update Sync</a>

@@ -1,12 +1,13 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
 
+	"github.com/abusomani/jsonhandlers"
 	"github.com/charmbracelet/log"
-	"github.com/ilyakaznacheev/cleanenv"
 
 	h "github.com/kociumba/Kopycat/handlers"
 )
@@ -16,15 +17,16 @@ import (
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 type SyncConfig struct {
-	interval time.Duration `yaml:"interval"`
-	targets  []struct {
-		target Target `yaml:"target"`
-	} `yaml:"targets"`
+	Interval time.Duration `json:"interval"`
+	Targets  []struct {
+		Target Target `json:"target"`
+	} `json:"targets"`
+	cfg jsonhandlers.JSONHandler
 }
 
 type Target struct {
-	PathOrigin      string `yaml:"path"`
-	PathDestination string `yaml:"drive"`
+	PathOrigin      string `json:"path"`
+	PathDestination string `json:"drive"`
 }
 
 var (
@@ -32,55 +34,107 @@ var (
 	ServerConfig        SyncConfig
 )
 
-func AddToSync(path string) {
-	log.Info("Adding to sync", "path", path)
+func NewSyncConfig() *SyncConfig {
+	configPath, _ := GetRelativePath()
+	cfg := jsonhandlers.New(jsonhandlers.WithFileHandler(configPath))
+	return &SyncConfig{
+		cfg: *cfg.SetOptions(jsonhandlers.WithFileHandler(configPath)),
+	}
+}
 
-	err := cleanenv.UpdateEnv(&ServerConfig)
+func (c *SyncConfig) AddToSync(PathOrigin, PathDestination string) {
+	log.Info("Adding to sync", "origin", PathOrigin, "destination", PathDestination)
+
+	ServerConfig.Targets = append(ServerConfig.Targets, struct {
+		Target Target `json:"target"`
+	}{
+		Target: Target{
+			PathOrigin:      PathOrigin,
+			PathDestination: PathDestination,
+		},
+	})
+
+	err := c.SaveConfig()
 	if err != nil {
 		h.Clog.Error(err)
 	}
-
 }
 
-func GetRelativePath() string {
+func GetRelativePath() (string, string) {
 	executable, err := os.Executable()
 	if err != nil {
-		log.Fatal(err)
+		h.Clog.Fatal(err)
 	}
 
 	execDir := filepath.Dir(executable)
 	configDir := filepath.Join(execDir, "config")
-	configPath := filepath.Join(configDir, "config.yml")
+	configPath := filepath.Join(configDir, "config.json")
 
-	return configPath
+	return configPath, configDir
 }
 
-func ReadConfig() {
-	var configPath = GetRelativePath()
+func (c *SyncConfig) ReadConfig() {
+	configPath, configDir := GetRelativePath()
+	log.Info("Reading config at", "path", configPath)
 
-	h.Clog.Info("Reading config at", "path", configPath)
-
-	err := cleanenv.ReadConfig(configPath, &ServerConfig)
+	err := c.cfg.Unmarshal(&ServerConfig)
 	if err != nil {
-		h.Clog.Warn(err)
+		h.Clog.Warn("Failed to read config file", "error", err)
 		if attemptCreateConfig {
-			h.Clog.Info("Failed to read config, check logs and relunch Kopycat")
+			h.Clog.Info("Failed to read config, check logs and relaunch the application")
 		} else {
-			Createconfig(configPath)
+			c.CreateConfig(configPath, configDir)
 		}
+		return
 	}
+
+	h.Clog.Info(ServerConfig)
 }
 
-func Createconfig(configPath string) {
-	h.Clog.Info("Creating config in ", "path", configPath)
+func (c *SyncConfig) CreateConfig(configPath, configDir string) {
+	h.Clog.Info("Creating config in", "path", configPath)
 	attemptCreateConfig = true
+
+	err := os.MkdirAll(configDir, 0755)
+	if err != nil {
+		h.Clog.Error(err)
+		return
+	}
 
 	f, err := os.Create(configPath)
 	if err != nil {
 		h.Clog.Error(err)
+		return
 	}
-
 	f.Close()
 
-	ReadConfig()
+	ServerConfig = SyncConfig{
+		Interval: 60 * time.Second,
+		Targets: []struct {
+			Target Target `json:"target"`
+		}{},
+	}
+
+	err = c.SaveConfig()
+	if err != nil {
+		h.Clog.Error("Failed to save config", err)
+	}
+
+	c.ReadConfig()
+}
+
+func (c *SyncConfig) SaveConfig() error {
+	if c == nil {
+		return fmt.Errorf("SyncConfig is nil")
+	}
+
+	h.Clog.Info("Saving config")
+	err := c.cfg.Marshal(&ServerConfig)
+	if err != nil {
+		return err
+	}
+
+	h.Clog.Info("Config saved")
+
+	return nil
 }
