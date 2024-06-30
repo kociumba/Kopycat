@@ -27,6 +27,8 @@ var s = scheduler.NewScheduler(func() {
 	handlers.CheckDirs()
 })
 
+var port = flag.String("port", "", "Port to start the server.")
+
 func (p *program) Start(s service.Service) error {
 	if service.Interactive() {
 		logger.Info("Running in terminal.")
@@ -55,7 +57,10 @@ func (p *program) run() {
 	s.ChangeInterval(time.Second * 2) // Change interval to 1 second
 
 	//Do not call this first or logs will get fucked
-	guiServer = gui.NewGUIServer("42069")
+	if *port == "" {
+		*port = "42069"
+	}
+	guiServer = gui.NewGUIServer(*port)
 
 	// logger.Error(guiServer.Start())
 	guiServer.Start()

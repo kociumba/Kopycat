@@ -1,5 +1,3 @@
-github.com/abusomani/jsonhandlers v1.1.0 h1:f3ak5zf1JtpRdUVtsl8rMVk15jVvE5t3IhankjXIqnQ=
-github.com/abusomani/jsonhandlers v1.1.0/go.mod h1:OoYWeP1c8UJvNTD0GRTO+QT7EmZr9XhfIt9iRb4S2YI=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1 h1:HwpRHbFMcZLEVr42D4p7XBqjyuxQH5SMiErDT4WkJ2k=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1/go.mod h1:uYgXzlJ7ZpABp8OJ+exZzJJhRNQ2ASbcXHWsFqH8hp8=
 github.com/charmbracelet/lipgloss v0.10.0 h1:KWeXFSexGcfahHX+54URiZGkBFazf70JNMtwg/AFW3s=

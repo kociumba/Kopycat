@@ -74,31 +74,19 @@
                 </section>
                 <section class="folders">
                     <h2>Synced Folders</h2>
-                    <div hx-target="#synced-folders-list">
-                        <!-- <form hx-post="/add-sync">
-                            <label for="files" class="button">Select files:</label>
-                            <input type="file" id="files" name="files" multiple style="display: none;"><br><br>
-                            <input type="submit" class="button">
-                          </form> -->
-                        <!-- <div id="drives-list" hx-get="/get-system-drives" hx-trigger="load">
-                        </div>
-                        <template id="drive-template">
-                            <div class="drive">
-                                <input type="radio" name="drives-option" value="{{.}}" id="{{.}}"><span>{{.}}</span>
-                            </div>
-                        </template> -->
+                    <div>
                         <label for="originPath">Enter Origin Folder Path:</label>
-                        <input type="text" id="originPath" placeholder="root/users/username/origin"><br>
+                        <input type="text" id="originPath" placeholder="root/users/username/origin">
                         <label for="destinationPath">Enter Destination Folder Path:</label>
                         <input type="text" id="destinationPath" placeholder="root/users/username/destination">
-
-                        <!-- <a class="button" onclick="openFile()">Add files to sync</a> -->
                         <a class="button" onclick="submitFiles()">Update Sync</a>
                     </div>
                     <h2>Manage Sync Targets</h2>
-                    <div id="targets-container" hx-get="/get-sync-targets" hx-trigger="load"
+                    <!-- <div id="targets-container" hx-get="/get-sync-targets" hx-trigger="load click submitFiles"
+                        hx-target="#targets-container"> -->
+                    <div id="targets-container" hx-get="/get-sync-targets" hx-trigger="load every 1s"
                         hx-target="#targets-container">
-                        <!-- The targets will be loaded here -->
+                        <!-- Target items will be dynamically added here -->
                     </div>
                 </section>
                 <section class="settings">
@@ -127,11 +115,21 @@
     </html>
 
     <style>
-
         @import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
 
         :root {
-            --radius: 0.25rem;
+            --radius: 0.5rem;
+            --bg-color: #121212;
+            --card-bg-color: #1f1f1f;
+            --primary-color: #4CAF50;
+            --secondary-color: #58cf3a;
+            --text-color: #e0e0e0;
+            --header-footer-bg: #2c2c2c;
+        }
+
+        :root::selection {
+            background-color: var(--primary-color);
+            color: var(--bg-color);
         }
 
         html,
@@ -139,74 +137,106 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden;
-            font-family: Poppins, sans-serif;
-            line-height: 1.6;
-            background-color: #1a1a1a;
-            color: #e0e0e0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
         }
 
         .container {
             width: 80%;
             margin: auto;
-            overflow: hidden;
-            padding: 20px;
             display: flex;
             flex-direction: column;
-            box-sizing: border-box;
+            gap: 20px;
+            padding: 20px;
         }
 
-        header {
-            background: #2c2c2c;
+        header,
+        footer {
+            background: var(--header-footer-bg);
             color: #ffffff;
-            padding-top: 30px;
-            min-height: 70px;
-            border-bottom: #4CAF50 3px solid;
-            flex-shrink: 0;
-            padding: 10px 0;
+            text-align: center;
+            padding: 20px;
+            border-radius: var(--radius);
         }
 
-        header h1 {
+        header h1,
+        footer p {
             margin: 0;
-            text-align: center;
-            padding-bottom: 20px;
         }
 
         main {
-            flex-grow: 1;
-            overflow: hidden;
-            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        footer {
-            background: #2c2c2c;
-            color: #ffffff;
-            text-align: center;
+        section {
+            background: var(--card-bg-color);
             padding: 20px;
-            margin-top: 20px;
-            flex-shrink: 0;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         h2 {
             color: #ffffff;
-            border-bottom: 1px solid #4CAF50;
+            border-bottom: 2px solid var(--primary-color);
             padding-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         .progress-bar {
             width: 100%;
             background-color: #444444;
-            padding: 3px;
-            border-radius: --radius;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius);
+            overflow: hidden;
+            height: 22px;
+            margin-top: 10px;
         }
 
         .progress-bar .progress {
             display: block;
-            height: 22px;
-            background-color: #4CAF50;
-            border-radius: --radius;
+            height: 100%;
+            background-color: var(--primary-color);
             transition: width 500ms ease-in-out;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input[type="text"],
+        select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: var(--radius);
+            border: 1px solid var(--primary-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            outline: none;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        .button,
+        .button:hover {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .button:hover {
+            background: var(--secondary-color);
         }
 
         ul {
@@ -218,54 +248,42 @@
             background: #3a3a3a;
             padding: 10px;
             margin-bottom: 5px;
+            border-radius: var(--radius);
         }
 
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #4CAF50;
-            color: #ffffff;
+        #sync-status span {
+            color: var(--primary-color);
+        }
+
+        #targets-container {
+            margin-top: 20px;
+        }
+
+        .target-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg-color);
+            padding: 10px;
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .target-item span {
+            margin-right: 10px;
+        }
+
+        .target-item button {
+            background: var(--primary-color);
             border: none;
-            border-radius: --radius;
+            color: #ffffff;
+            border-radius: var(--radius);
+            /* padding: 5px 10px; */
             cursor: pointer;
         }
 
-        .button:hover {
-            background: #58cf3a;
-        }
-
-        select {
-            border-color: #4CAF50;
-            padding: 5px;
-            background-color: #3a3a3a;
-            color: #e0e0e0;
-            border: 1px solid #4CAF50;
-        }
-
-        input[type="checkbox"] {
-            margin-right: 5px;
-        }
-
-        /* Additional styles for better contrast */
-        #sync-status span,
-        .select {
-            color: #4CAF50;
-        }
-
-        /* Change blue to green */
-        header {
-            border-bottom-color: #4CAF50;
-        }
-
-        .progress-bar .progress {
-            background-color: #4CAF50;
-        }
-
-        button {
-            background: #4CAF50;
-        }
-
-        button:hover {
-            background: #45a049;
+        .target-item button:hover {
+            background: var(--secondary-color);
         }
     </style>

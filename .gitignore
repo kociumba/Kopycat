@@ -24,3 +24,6 @@ go.work
 /bin/logs
 *.bak
 /bin/config
+/bin/linux
+*
+

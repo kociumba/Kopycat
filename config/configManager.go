@@ -77,7 +77,7 @@ func GetRelativePath() (string, string) {
 
 func (c *SyncConfig) ReadConfig() {
 	configPath, configDir := GetRelativePath()
-	log.Info("Reading config at", "path", configPath)
+	// log.Info("Reading config at", "path", configPath)
 
 	file, err := os.Open(configPath)
 	if err != nil {
@@ -100,7 +100,7 @@ func (c *SyncConfig) ReadConfig() {
 
 	*c = ServerConfig
 
-	h.Clog.Info(ServerConfig)
+	// h.Clog.Info(ServerConfig)
 }
 
 func (c *SyncConfig) ReturnTargets() []Target {

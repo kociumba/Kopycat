@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -75,6 +76,18 @@ func (s *GUIServer) Start() error {
 	s.mux.HandleFunc("/add-folder", s.handleAddFolder)
 	s.mux.HandleFunc("/get-system-drives", s.returnSystemDrives)
 	s.mux.HandleFunc("/get-sync-targets", s.returnSyncTargets)
+
+	// FOR PROFILING
+	// s.mux.HandleFunc("/debug/pprof/", pprof.Index)
+	// s.mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+	// s.mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+	// s.mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+	// s.mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+
+	// s.mux.Handle("/debug/pprof/block", pprof.Handler("block"))
+	// s.mux.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
+	// s.mux.Handle("/debug/pprof/heap", pprof.Handler("heap"))
+	// s.mux.Handle("/debug/pprof/threadcreate", pprof.Handler("threadcreate"))
 
 	s.wg.Add(1)
 	go func() {
@@ -162,7 +175,7 @@ func (s *GUIServer) returnSyncTargets(w http.ResponseWriter, r *http.Request) {
 
 	tmpl := `
 	{{range .}}
-		<div class="targets">
+		<div class="target-item">
 			<span>{{.PathOrigin}} -> {{.PathDestination}}
 			<button class="button" onclick="deleteTarget('{{.PathOrigin}}', '{{.PathDestination}}')">Delete</button>
 			</span>
@@ -189,4 +202,7 @@ func (s *GUIServer) returnSyncTargets(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 	w.Write([]byte(sb.String()))
+
+	//Testing to see if this works
+	go runtime.GC()
 }

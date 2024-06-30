@@ -2,10 +2,7 @@ module github.com/kociumba/Kopycat
 
 go 1.22.1
 
-require (
-	github.com/abusomani/jsonhandlers v1.1.0
-	github.com/kardianos/service v1.2.2
-)
+require github.com/kardianos/service v1.2.2
 
 require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
