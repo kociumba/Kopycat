@@ -76,6 +76,8 @@ func (s *GUIServer) Start() error {
 	s.mux.HandleFunc("/add-folder", s.handleAddFolder)
 	s.mux.HandleFunc("/get-system-drives", s.returnSystemDrives)
 	s.mux.HandleFunc("/get-sync-targets", s.returnSyncTargets)
+	s.mux.HandleFunc("/get-current-interval", s.returnCurrentInterval)
+	s.mux.HandleFunc("/set-new-interval", s.setNewInterval)
 
 	// FOR PROFILING
 	// s.mux.HandleFunc("/debug/pprof/", pprof.Index)

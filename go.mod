@@ -1,6 +1,6 @@
 module github.com/kociumba/kopycat
 
-go 1.22.1
+go 1.22.5
 
 require github.com/kardianos/service v1.2.2
 

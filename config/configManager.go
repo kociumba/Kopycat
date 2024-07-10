@@ -18,8 +18,8 @@ type SyncConfig struct {
 }
 
 type Target struct {
-	PathOrigin      string `json:"path"`
-	PathDestination string `json:"drive"`
+	PathOrigin      string `json:"path-origin"`
+	PathDestination string `json:"path-destination"`
 }
 
 var (
@@ -84,7 +84,7 @@ func (c *SyncConfig) ReadConfig() {
 		h.Clog.Warn("Failed to read config file", "error", err)
 		if attemptCreateConfig {
 			h.Clog.Info("Failed to read config, check logs and relaunch the application")
-		} else {
+		} else if ServerConfig.Interval == 0 && len(ServerConfig.Targets) == 0 {
 			*c = SyncConfig{}
 			c.CreateConfig(configPath, configDir)
 			ServerConfig = *c
@@ -148,7 +148,7 @@ func (c *SyncConfig) SaveConfig() error {
 
 	configPath, _ := GetRelativePath()
 
-	h.Clog.Info("Saving config")
+	// h.Clog.Info("Saving config")
 	file, err := os.Create(configPath)
 	if err != nil {
 		return err
@@ -160,7 +160,7 @@ func (c *SyncConfig) SaveConfig() error {
 		return err
 	}
 
-	h.Clog.Info("Config saved")
+	h.Clog.Info("Config saved", "as", c)
 
 	return nil
 }

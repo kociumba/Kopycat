@@ -11,7 +11,7 @@ import (
 	"github.com/kociumba/kopycat/controller"
 	"github.com/kociumba/kopycat/gui"
 	"github.com/kociumba/kopycat/handlers"
-	"github.com/kociumba/kopycat/scheduler"
+	"github.com/kociumba/kopycat/internal"
 )
 
 var logger service.Logger
@@ -21,11 +21,6 @@ type program struct {
 }
 
 var guiServer *gui.GUIServer
-
-// Setup the main scheduler callback
-var s = scheduler.NewScheduler(func() {
-	handlers.CheckDirs()
-})
 
 var port = flag.String("port", "", "Port to start the server.")
 
@@ -56,8 +51,12 @@ func (p *program) run() {
 	configManager.ReadConfig()
 
 	// Start main scheduler
-	s.Start()
-	s.ChangeInterval(time.Second * 2) // Change interval to 1 second
+	internal.S.Start()
+	// Always update the interval
+	if config.ServerConfig.Interval < time.Second*10 {
+		config.ServerConfig.Interval = time.Second * 10
+	}
+	internal.S.ChangeInterval(config.ServerConfig.Interval)
 
 	// Do not call this first or logs will get fucked
 	if *port == "" {
@@ -77,9 +76,8 @@ func (p *program) Stop(service service.Service) error {
 	// Stop should not block. Return with a few seconds.
 
 	// Stop all running tasks
-	s.Stop()
+	internal.S.Stop()
 	service.Stop()
-	handlers.LogCleaner.Stop()
 
 	// Stop web GUI
 	err := guiServer.Stop()

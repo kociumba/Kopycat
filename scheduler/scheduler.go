@@ -22,8 +22,6 @@ type Scheduler struct {
 //	func callback() {
 //		counter++
 //	}()
-//
-// can be used and will retain their state
 func NewScheduler(callback func()) *Scheduler {
 	return &Scheduler{
 		intervalChan: make(chan time.Duration),
@@ -40,6 +38,10 @@ func (s *Scheduler) Start() {
 }
 
 // Call to stop the scheduler
+//
+// Technically safe to call without first calling
+//
+//	Sheduler.Start()
 func (s *Scheduler) Stop() {
 	s.once.Do(func() {
 		// Initialize the channel to avoid closing a nil channel

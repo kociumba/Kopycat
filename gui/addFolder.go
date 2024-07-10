@@ -70,6 +70,7 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 
 	// Add the folder to sync
 	config.ServerConfig.AddToSync(req.Origin, req.Destination)
+	config.ServerConfig.SaveConfig()
 
 	// Prepare and send the response
 	res := FolderPathResponse{FullPath: req.Origin + " -> " + req.Destination}
