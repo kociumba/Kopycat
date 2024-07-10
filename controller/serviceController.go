@@ -22,7 +22,7 @@ func ServiceController(command string, ser service.Service) {
 			}
 			err = ser.Uninstall()
 			if err != nil {
-				log.Fatal("Service could not be uninstalled, try running stop or remove first.", "error", err)
+				log.Fatal("Service could not be uninstalled, try running stop or restart first.", "error", err)
 			}
 			err = ser.Install()
 			if err != nil {
@@ -41,7 +41,7 @@ func ServiceController(command string, ser service.Service) {
 		}
 		err = ser.Uninstall()
 		if err != nil {
-			log.Fatal("Service could not be uninstalled, try running stop or remove first.", "error", err)
+			log.Fatal("Service could not be uninstalled, try running stop or install first.", "error", err)
 		}
 		log.Info("Service uninstalled.")
 	case "start":

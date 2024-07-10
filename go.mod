@@ -1,4 +1,4 @@
-module github.com/kociumba/Kopycat
+module github.com/kociumba/kopycat
 
 go 1.22.1
 

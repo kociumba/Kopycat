@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/kociumba/Kopycat/config"
-	h "github.com/kociumba/Kopycat/handlers"
+	"github.com/kociumba/kopycat/config"
+	h "github.com/kociumba/kopycat/handlers"
 )
 
 func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {

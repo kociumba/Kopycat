@@ -7,11 +7,11 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/kardianos/service"
-	"github.com/kociumba/Kopycat/config"
-	"github.com/kociumba/Kopycat/controller"
-	"github.com/kociumba/Kopycat/gui"
-	"github.com/kociumba/Kopycat/handlers"
-	"github.com/kociumba/Kopycat/scheduler"
+	"github.com/kociumba/kopycat/config"
+	"github.com/kociumba/kopycat/controller"
+	"github.com/kociumba/kopycat/gui"
+	"github.com/kociumba/kopycat/handlers"
+	"github.com/kociumba/kopycat/scheduler"
 )
 
 var logger service.Logger
@@ -22,7 +22,7 @@ type program struct {
 
 var guiServer *gui.GUIServer
 
-// Determines what the scheduler does on each interval
+// Setup the main scheduler callback
 var s = scheduler.NewScheduler(func() {
 	handlers.CheckDirs()
 })
@@ -30,6 +30,7 @@ var s = scheduler.NewScheduler(func() {
 var port = flag.String("port", "", "Port to start the server.")
 
 func (p *program) Start(s service.Service) error {
+	// Check if running in terminal
 	if service.Interactive() {
 		logger.Info("Running in terminal.")
 	} else {
@@ -50,32 +51,43 @@ func (p *program) run() {
 	//Always call first to init the file logger
 	handlers.Setup()
 
+	// Load config
 	configManager := config.NewSyncConfig()
 	configManager.ReadConfig()
 
+	// Start main scheduler
 	s.Start()
 	s.ChangeInterval(time.Second * 2) // Change interval to 1 second
 
-	//Do not call this first or logs will get fucked
+	// Do not call this first or logs will get fucked
 	if *port == "" {
 		*port = "42069"
 	}
+	// Start web GUI
 	guiServer = gui.NewGUIServer(*port)
-
-	// logger.Error(guiServer.Start())
 	guiServer.Start()
+
+	// start log cleaner
+	// to make this actually work i would have to mutex the log file
+	// and intercept the charmbracelet/log package
+	// handlers.LogCleaner.Start()
 }
 
 func (p *program) Stop(service service.Service) error {
 	// Stop should not block. Return with a few seconds.
+
+	// Stop all running tasks
 	s.Stop()
 	service.Stop()
+	handlers.LogCleaner.Stop()
 
+	// Stop web GUI
 	err := guiServer.Stop()
 	if err != nil {
 		logger.Error(err)
 	}
 
+	// Stop the service
 	logger.Info("Stopping Service!")
 	close(p.exit)
 	return nil

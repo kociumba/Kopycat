@@ -9,7 +9,7 @@ import (
 
 	"github.com/charmbracelet/log"
 
-	h "github.com/kociumba/Kopycat/handlers"
+	h "github.com/kociumba/kopycat/handlers"
 )
 
 type SyncConfig struct {

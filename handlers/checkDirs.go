@@ -3,8 +3,10 @@ package handlers
 import (
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/charmbracelet/log"
+	"github.com/kociumba/kopycat/scheduler"
 )
 
 var (
@@ -13,6 +15,8 @@ var (
 	Clog       *log.Logger
 	counter    int
 	err        error
+
+	LogCleaner *scheduler.Scheduler
 )
 
 func CheckDirs() {
@@ -46,11 +50,6 @@ func Setup() *log.Logger {
 	logDir := filepath.Join(execDir, "logs")
 	logPath := filepath.Join(logDir, "Kopycat.log")
 
-	// Clean old log files to avoid cluttering the disk with useless logs
-	if err = cleanOldLogs(logPath); err != nil {
-		log.Fatal(err)
-	}
-
 	if err = os.MkdirAll(logDir, 0755); err != nil {
 		log.Fatal(err)
 	}
@@ -65,6 +64,15 @@ func Setup() *log.Logger {
 	Clog.SetReportTimestamp(true)
 	Clog.SetTimeFormat("2006-01-02 15:04:05")
 	Clog.SetReportCaller(true)
+
+	// Clean old log files to avoid cluttering the disk with useless
+	// Set up a scheduler to clean old log files
+	LogCleaner = scheduler.NewScheduler(func() {
+		if err = cleanOldLogs(logPath); err != nil {
+			Clog.Warn(err)
+		}
+	})
+	LogCleaner.ChangeInterval(time.Minute * 5)
 
 	log.Info("Logging to", "path", logPath)
 

@@ -11,11 +11,12 @@ type Scheduler struct {
 	intervalChan chan time.Duration
 	wg           sync.WaitGroup
 	callback     func()
+	once         sync.Once
 }
 
 // Call to create a scheduler with the callback function to use
 //
-// The callback function is technically becoming recursive so things like
+// Things like this will work in the callback
 //
 //	var counter int
 //	func callback() {
@@ -32,19 +33,28 @@ func NewScheduler(callback func()) *Scheduler {
 
 // Call to start the scheduler
 func (s *Scheduler) Start() {
-	s.wg.Add(1)
-	go s.scheduleCheck()
+	s.once.Do(func() {
+		s.wg.Add(1)
+		go s.scheduleCheck()
+	})
 }
 
 // Call to stop the scheduler
 func (s *Scheduler) Stop() {
+	s.once.Do(func() {
+		// Initialize the channel to avoid closing a nil channel
+		s.intervalChan = make(chan time.Duration)
+	})
 	close(s.intervalChan)
 	s.wg.Wait()
 }
 
 // Call with a time.Duration to change the interval at witch the scheduler runs
+// Had to force it to be non blocking as it would block in some scenarios
 func (s *Scheduler) ChangeInterval(newInterval time.Duration) {
-	s.intervalChan <- newInterval
+	go func() {
+		s.intervalChan <- newInterval
+	}()
 }
 
 func (s *Scheduler) scheduleCheck() {
@@ -67,7 +77,7 @@ func (s *Scheduler) scheduleCheck() {
 				log.Info("Stopping scheduler")
 				return
 			}
-			log.Info("Changing interval to", "interval", newInterval)
+			log.Info("Changing interval to", "interval", newInterval, "with callback", s.callback)
 			interval = newInterval
 			if !timer.Stop() {
 				<-timer.C

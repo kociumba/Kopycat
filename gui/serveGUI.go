@@ -11,8 +11,8 @@ import (
 	"sync"
 
 	"github.com/charmbracelet/log"
-	"github.com/kociumba/Kopycat/config"
-	h "github.com/kociumba/Kopycat/handlers"
+	"github.com/kociumba/kopycat/config"
+	h "github.com/kociumba/kopycat/handlers"
 )
 
 //go:embed webGUI/*
