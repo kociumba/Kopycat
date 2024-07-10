@@ -192,7 +192,7 @@ func (s *GUIServer) returnSyncTargets(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.Clog.Info("Targets:", "targets", targets)
+	// h.Clog.Info("Targets:", "targets", targets)
 
 	var sb strings.Builder
 	err = t.Execute(&sb, targets)
