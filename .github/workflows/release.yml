@@ -17,8 +17,7 @@ jobs:
         # hope this works
       - name: Generate resource files
         run: |
-          go install github.com/tc-hib/go-winres@latest
-          go-winres make
+          go run github.com/tc-hib/go-winres@latest make
 
       - name: Build
         uses: crazy-max/ghaction-xgo@v3
