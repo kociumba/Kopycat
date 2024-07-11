@@ -160,7 +160,7 @@ func (c *SyncConfig) SaveConfig() error {
 		return err
 	}
 
-	h.Clog.Info("Config saved", "as", c)
+	// h.Clog.Info("Config saved", "as", c)
 
 	return nil
 }

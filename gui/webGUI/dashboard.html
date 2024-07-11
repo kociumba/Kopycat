@@ -37,7 +37,14 @@
                 return;
             }
 
-            // Send the drive and filePath to the backend
+            addfolder(originPath, destinationPath);
+        }
+
+        /** 
+         * @param {string} originPath - the origin path of the folder to be added
+         * @param {string} destinationPath - the destination path of the folder to be added
+         */
+        function addfolder(originPath, destinationPath) {
             $.ajax({
                 type: 'POST',
                 url: '/add-folder',
@@ -55,11 +62,30 @@
             });
         }
 
-        function deleteTarget(pathOrigin, pathDestination) {
+        /**
+         * @param {string} originPath - the origin path of the folder to be deleted
+         * @param {string} destinationPath - the destination path of the folder to be deleted
+         */
+        function deleteTarget(originPath, destinationPath) {
             // Implement your delete logic here
-            console.log("Delete target:", pathOrigin, "->", pathDestination);
-        }
+            console.log("Delete target:", originPath, "->", destinationPath);
 
+            $.ajax({
+                type: 'POST',
+                url: '/delete-folder',
+                contentType: 'application/json',
+                data: JSON.stringify({ origin: originPath, destination: destinationPath }),
+                success: function (response) {
+                    console.log('Full path from backend:', response.fullPath);
+                    alert('Folder deleted from sync: ' + response.fullPath);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Error resolving folder path:', textStatus, errorThrown);
+                    console.log('Response:', jqXHR.responseText);
+                    alert('Error resolving folder path: ' + textStatus);
+                }
+            })
+        }
 
         function changeInterval() {
             var selectedOption = parseInt($("#sync-interval").val());
@@ -99,6 +125,7 @@
                         <label for="destinationPath">Enter Destination Folder Path:</label>
                         <input type="text" id="destinationPath" placeholder="root/users/username/destination">
                         <a class="button" onclick="submitFiles()">Update Sync</a>
+                        <!-- <a class="button" onclick="addfolder('C:/Users/kociu', 'C:/Users/username/destination')">Test button</a> -->
                     </div>
                     <h2>Manage Sync Targets</h2>
                     <!-- <div id="targets-container" hx-get="/get-sync-targets" hx-trigger="load click submitFiles"

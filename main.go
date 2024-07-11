@@ -62,6 +62,7 @@ func (p *program) run() {
 	if *port == "" {
 		*port = "42069"
 	}
+
 	// Start web GUI
 	guiServer = gui.NewGUIServer(*port)
 	guiServer.Start()

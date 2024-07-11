@@ -74,6 +74,7 @@ func (s *GUIServer) Start() error {
 	})
 
 	s.mux.HandleFunc("/add-folder", s.handleAddFolder)
+	s.mux.HandleFunc("/delete-folder", s.handleDeleteFolder)
 	s.mux.HandleFunc("/get-system-drives", s.returnSystemDrives)
 	s.mux.HandleFunc("/get-sync-targets", s.returnSyncTargets)
 	s.mux.HandleFunc("/get-current-interval", s.returnCurrentInterval)
