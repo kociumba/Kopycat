@@ -3,7 +3,6 @@ package handlers
 import (
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/kociumba/kopycat/scheduler"
@@ -50,6 +49,13 @@ func Setup() *log.Logger {
 	logDir := filepath.Join(execDir, "logs")
 	logPath := filepath.Join(logDir, "Kopycat.log")
 
+	// I should run this continuously in scheduler but for that i would need a mutex on the log file
+	//
+	// Clean old log files to avoid cluttering the disk with useless logs
+	if err = cleanOldLogs(logPath); err != nil {
+		log.Fatal(err)
+	}
+
 	if err = os.MkdirAll(logDir, 0755); err != nil {
 		log.Fatal(err)
 	}
@@ -65,14 +71,16 @@ func Setup() *log.Logger {
 	Clog.SetTimeFormat("2006-01-02 15:04:05")
 	Clog.SetReportCaller(true)
 
+	// This is unfortunetly unusable right now
+	//
 	// Clean old log files to avoid cluttering the disk with useless
 	// Set up a scheduler to clean old log files
-	LogCleaner = scheduler.NewScheduler(func() {
-		if err = cleanOldLogs(logPath); err != nil {
-			Clog.Warn(err)
-		}
-	})
-	LogCleaner.ChangeInterval(time.Minute * 5)
+	// LogCleaner = scheduler.NewScheduler(func() {
+	// 	if err = cleanOldLogs(logPath); err != nil {
+	// 		Clog.Warn(err)
+	// 	}
+	// })
+	// LogCleaner.ChangeInterval(time.Minute * 5)
 
 	log.Info("Logging to", "path", logPath)
 

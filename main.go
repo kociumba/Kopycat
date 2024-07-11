@@ -52,7 +52,7 @@ func (p *program) run() {
 
 	// Start main scheduler
 	internal.S.Start()
-	// Always update the interval
+	// This get's funny if the interval is too low 💀
 	if config.ServerConfig.Interval < time.Second*10 {
 		config.ServerConfig.Interval = time.Second * 10
 	}

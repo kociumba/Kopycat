@@ -8,6 +8,7 @@ import (
 
 	"github.com/kociumba/kopycat/config"
 	h "github.com/kociumba/kopycat/handlers"
+	"github.com/kociumba/kopycat/sync"
 )
 
 func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
@@ -68,9 +69,20 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Propably the best way i can do this without creating a circular dependency
+	hash, err := sync.GetHashFromTarget(config.Target{
+		PathOrigin:      req.Origin,
+		PathDestination: req.Destination,
+	})
+	if err != nil {
+		h.Clog.Error("Error getting hash from target", "error", err)
+		http.Error(w, "Error getting hash from target", http.StatusInternalServerError)
+		return
+	}
+
 	// Add the folder to sync
-	config.ServerConfig.AddToSync(req.Origin, req.Destination)
-	config.ServerConfig.SaveConfig()
+	config.ServerConfig.AddToSync(req.Origin, req.Destination, hash)
+	// config.ServerConfig.SaveConfig()
 
 	// Prepare and send the response
 	res := FolderPathResponse{FullPath: req.Origin + " -> " + req.Destination}

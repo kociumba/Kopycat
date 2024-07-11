@@ -20,6 +20,7 @@ type SyncConfig struct {
 type Target struct {
 	PathOrigin      string `json:"path-origin"`
 	PathDestination string `json:"path-destination"`
+	Hash            string `json:"hash"`
 }
 
 var (
@@ -32,12 +33,16 @@ func NewSyncConfig() *SyncConfig {
 	return &SyncConfig{}
 }
 
-func (c *SyncConfig) AddToSync(PathOrigin, PathDestination string) {
+// I hope this works with the hash
+//
+// Saves the config afterwards
+func (c *SyncConfig) AddToSync(PathOrigin, PathDestination string, Hash string) {
 	log.Info("Adding to sync", "origin", PathOrigin, "destination", PathDestination)
 
 	ServerConfig.Targets = append(ServerConfig.Targets, Target{
 		PathOrigin:      PathOrigin,
 		PathDestination: PathDestination,
+		Hash:            Hash,
 	})
 
 	err := c.SaveConfig()
