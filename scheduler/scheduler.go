@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
+	"github.com/kociumba/kopycat/internal"
 )
 
 type Scheduler struct {
@@ -79,7 +80,7 @@ func (s *Scheduler) scheduleCheck() {
 				log.Info("Stopping scheduler")
 				return
 			}
-			log.Info("Changing interval to", "interval", newInterval, "with callback", s.callback)
+			log.Info("Changing interval to", "interval", newInterval, "with callback", internal.GetFuncName(s.callback, internal.Both))
 			interval = newInterval
 			if !timer.Stop() {
 				<-timer.C

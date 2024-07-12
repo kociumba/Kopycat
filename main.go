@@ -11,7 +11,7 @@ import (
 	"github.com/kociumba/kopycat/controller"
 	"github.com/kociumba/kopycat/gui"
 	logSetup "github.com/kociumba/kopycat/logger"
-	"github.com/kociumba/kopycat/mainloop"
+	"github.com/kociumba/kopycat/tasks"
 )
 
 var logger service.Logger
@@ -51,12 +51,12 @@ func (p *program) run() {
 	configManager.ReadConfig()
 
 	// Start main scheduler
-	mainloop.S.Start()
+	tasks.S.Start()
 	// This get's funny if the interval is too low 💀
 	if config.ServerConfig.Interval < time.Second*10 {
 		config.ServerConfig.Interval = time.Second * 10
 	}
-	mainloop.S.ChangeInterval(config.ServerConfig.Interval)
+	tasks.S.ChangeInterval(config.ServerConfig.Interval)
 
 	// Do not call this first or logs will get fucked
 	if *port == "" {
@@ -77,7 +77,7 @@ func (p *program) Stop(service service.Service) error {
 	// Stop should not block. Return with a few seconds.
 
 	// Stop all running tasks
-	mainloop.S.Stop()
+	tasks.S.Stop()
 	service.Stop()
 
 	// Stop web GUI

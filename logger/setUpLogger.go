@@ -9,7 +9,7 @@ import (
 
 var (
 	executable string
-	logFile    *os.File
+	LogFile    *os.File
 	Clog       *log.Logger
 	err        error
 )
@@ -38,13 +38,13 @@ func Setup() *log.Logger {
 		log.Fatal(err)
 	}
 
-	logFile, err = os.OpenFile(logPath, os.O_CREATE|os.O_APPEND, 0666)
+	LogFile, err = os.OpenFile(logPath, os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Initialize the logger with the file output
-	Clog = log.New(logFile)
+	Clog = log.New(LogFile)
 	Clog.SetReportTimestamp(true)
 	Clog.SetTimeFormat("2006-01-02 15:04:05")
 	Clog.SetReportCaller(true)

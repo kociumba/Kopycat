@@ -1,0 +1,21 @@
+name: tests
+
+# This is seperate becouse it's not related the reales of new versions
+# and I want to keep test results separate from bulding and releasing the app.
+
+on:
+    push:
+      branches: [ "main" ] # Triggers on pushes to main
+      tags: [ "v*" ] # Triggers on any tag with the prefix 'v'
+    pull_request:
+      branches: [ "main" ] # Triggers on pull requests
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Run tests and generate test report
+        run: go test -v -json ./... | go run github.com/mfridman/tparse@latest -all

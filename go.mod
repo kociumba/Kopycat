@@ -4,7 +4,6 @@ go 1.22.5
 
 require (
 	github.com/kardianos/service v1.2.2
-	github.com/otiai10/copy v1.14.0
 	github.com/spf13/afero v1.11.0
 )
 
@@ -20,7 +19,6 @@ require (
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
-	golang.org/x/sync v0.5.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 )
 

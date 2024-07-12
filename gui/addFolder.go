@@ -8,7 +8,7 @@ import (
 
 	"github.com/kociumba/kopycat/config"
 	l "github.com/kociumba/kopycat/logger"
-	"github.com/kociumba/kopycat/sync"
+	"github.com/kociumba/kopycat/syncer"
 )
 
 func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +70,7 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Propably the best way i can do this without creating a circular dependency
-	hash, err := sync.GetHashFromTarget(config.Target{
+	hash, err := syncer.GetHashFromTarget(config.Target{
 		PathOrigin:      req.Origin,
 		PathDestination: req.Destination,
 	})

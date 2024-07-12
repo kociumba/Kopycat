@@ -1,10 +1,13 @@
-package sync
+package syncer
 
 import (
 	"fmt"
+	"os"
+	"path"
+	"runtime"
 
 	"github.com/MShekow/directory-checksum/directory_checksum"
-	"github.com/otiai10/copy"
+	"github.com/charmbracelet/log"
 	"github.com/spf13/afero"
 
 	"github.com/kociumba/kopycat/config"
@@ -121,15 +124,58 @@ func (s *Syncer) CheckChanges() bool {
 func (s *Syncer) Sync() {
 	if s.CheckChanges() {
 		l.Clog.Info("Syncing", "from", s.target.PathOrigin, "to", s.target.PathDestination)
+		log.Info("Syncing", "from", s.target.PathOrigin, "to", s.target.PathDestination)
 
-		err := copy.Copy(s.target.PathOrigin, s.target.PathDestination)
+		err := Copy(s.target.PathOrigin, s.target.PathDestination)
 		if err != nil {
 			l.Clog.Error("Error syncing", "error", err)
+			log.Error("Error syncing", "error", err)
 		}
 	}
 
 	s.target.Hash, err = GetHashFromTarget(s.target)
 	if err != nil {
 		l.Clog.Error("Error calculating hash", "error", err)
+		log.Error("Error calculating hash", "error", err)
 	}
+}
+
+// Free all the memory the struct takes up and return true if successful
+func (s *Syncer) Free() bool {
+	runtime.SetFinalizer(s, nil)
+	return true
+}
+
+// Copies the whole directory recursively
+func Copy(src string, dst string) error {
+	var err error
+	var fds []os.DirEntry
+	var srcinfo os.FileInfo
+
+	if srcinfo, err = os.Stat(src); err != nil {
+		return err
+	}
+
+	if err = os.MkdirAll(dst, srcinfo.Mode()); err != nil {
+		return err
+	}
+
+	if fds, err = os.ReadDir(src); err != nil {
+		return err
+	}
+	for _, fd := range fds {
+		srcfp := path.Join(src, fd.Name())
+		dstfp := path.Join(dst, fd.Name())
+
+		if fd.IsDir() {
+			if err = Copy(srcfp, dstfp); err != nil {
+				fmt.Println(err)
+			}
+		} else {
+			if err = Copy(srcfp, dstfp); err != nil {
+				fmt.Println(err)
+			}
+		}
+	}
+	return nil
 }

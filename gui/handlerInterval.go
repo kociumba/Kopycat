@@ -9,7 +9,7 @@ import (
 
 	"github.com/kociumba/kopycat/config"
 	l "github.com/kociumba/kopycat/logger"
-	"github.com/kociumba/kopycat/mainloop"
+	"github.com/kociumba/kopycat/tasks"
 )
 
 type IntervalRequest struct {
@@ -53,6 +53,6 @@ func (s *GUIServer) setNewInterval(w http.ResponseWriter, r *http.Request) {
 	}
 
 	config.ServerConfig.Interval = time.Duration(req.Interval)
-	mainloop.S.ChangeInterval(config.ServerConfig.Interval)
+	tasks.S.ChangeInterval(config.ServerConfig.Interval)
 	config.ServerConfig.SaveConfig()
 }
