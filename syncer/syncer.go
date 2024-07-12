@@ -2,8 +2,6 @@ package syncer
 
 import (
 	"fmt"
-	"os"
-	"path"
 	"runtime"
 
 	"github.com/MShekow/directory-checksum/directory_checksum"
@@ -144,38 +142,4 @@ func (s *Syncer) Sync() {
 func (s *Syncer) Free() bool {
 	runtime.SetFinalizer(s, nil)
 	return true
-}
-
-// Copies the whole directory recursively
-func Copy(src string, dst string) error {
-	var err error
-	var fds []os.DirEntry
-	var srcinfo os.FileInfo
-
-	if srcinfo, err = os.Stat(src); err != nil {
-		return err
-	}
-
-	if err = os.MkdirAll(dst, srcinfo.Mode()); err != nil {
-		return err
-	}
-
-	if fds, err = os.ReadDir(src); err != nil {
-		return err
-	}
-	for _, fd := range fds {
-		srcfp := path.Join(src, fd.Name())
-		dstfp := path.Join(dst, fd.Name())
-
-		if fd.IsDir() {
-			if err = Copy(srcfp, dstfp); err != nil {
-				fmt.Println(err)
-			}
-		} else {
-			if err = Copy(srcfp, dstfp); err != nil {
-				fmt.Println(err)
-			}
-		}
-	}
-	return nil
 }
