@@ -8,8 +8,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
-
-	h "github.com/kociumba/kopycat/handlers"
+	l "github.com/kociumba/kopycat/logger"
 )
 
 type SyncConfig struct {
@@ -47,7 +46,7 @@ func (c *SyncConfig) AddToSync(PathOrigin, PathDestination string, Hash string) 
 
 	err := c.SaveConfig()
 	if err != nil {
-		h.Clog.Error(err)
+		l.Clog.Error(err)
 	}
 }
 
@@ -63,14 +62,14 @@ func (c *SyncConfig) RemoveFromSync(PathOrigin, PathDestination string) {
 
 	err := c.SaveConfig()
 	if err != nil {
-		h.Clog.Error(err)
+		l.Clog.Error(err)
 	}
 }
 
 func GetRelativePath() (string, string) {
 	executable, err := os.Executable()
 	if err != nil {
-		h.Clog.Fatal(err)
+		l.Clog.Fatal(err)
 	}
 
 	execDir := filepath.Dir(executable)
@@ -86,9 +85,9 @@ func (c *SyncConfig) ReadConfig() {
 
 	file, err := os.Open(configPath)
 	if err != nil {
-		h.Clog.Warn("Failed to read config file", "error", err)
+		l.Clog.Warn("Failed to read config file", "error", err)
 		if attemptCreateConfig {
-			h.Clog.Info("Failed to read config, check logs and relaunch the application")
+			l.Clog.Info("Failed to read config, check logs and relaunch the application")
 		} else if ServerConfig.Interval == 0 && len(ServerConfig.Targets) == 0 {
 			*c = SyncConfig{}
 			c.CreateConfig(configPath, configDir)
@@ -100,7 +99,7 @@ func (c *SyncConfig) ReadConfig() {
 
 	err = json.NewDecoder(file).Decode(&ServerConfig)
 	if err != nil {
-		h.Clog.Error(err)
+		l.Clog.Error(err)
 	}
 
 	*c = ServerConfig
@@ -117,18 +116,18 @@ func (c *SyncConfig) ReturnInterval() time.Duration {
 }
 
 func (c *SyncConfig) CreateConfig(configPath, configDir string) {
-	h.Clog.Info("Creating config in", "path", configPath)
+	l.Clog.Info("Creating config in", "path", configPath)
 	attemptCreateConfig = true
 
 	err := os.MkdirAll(configDir, 0755)
 	if err != nil {
-		h.Clog.Error(err)
+		l.Clog.Error(err)
 		return
 	}
 
 	file, err := os.Create(configPath)
 	if err != nil {
-		h.Clog.Error(err)
+		l.Clog.Error(err)
 		return
 	}
 	defer file.Close()
@@ -140,7 +139,7 @@ func (c *SyncConfig) CreateConfig(configPath, configDir string) {
 
 	err = c.SaveConfig()
 	if err != nil {
-		h.Clog.Error("Failed to save config", err)
+		l.Clog.Error("Failed to save config", err)
 	}
 
 	c.ReadConfig()

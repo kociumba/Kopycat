@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/afero"
 
 	"github.com/kociumba/kopycat/config"
-	h "github.com/kociumba/kopycat/handlers"
+	l "github.com/kociumba/kopycat/logger"
 )
 
 var (
@@ -25,7 +25,7 @@ type Syncer struct {
 func NewSyncer(target config.Target) *Syncer {
 	hash, err := GetHashFromTarget(target)
 	if err != nil {
-		h.Clog.Error(err)
+		l.Clog.Error(err)
 	}
 
 	if target.Hash == "" {
@@ -99,6 +99,10 @@ func GetHashFromTarget(target config.Target) (string, error) {
 	return checksum, nil
 }
 
+func GetHashFromPath(path string) (string, error) {
+	return GetHashFromTarget(config.Target{PathOrigin: path})
+}
+
 // if there is a change, return true
 func (s *Syncer) CheckChanges() bool {
 	currentHash, err := GetHashFromTarget(s.target)
@@ -116,16 +120,16 @@ func (s *Syncer) CheckChanges() bool {
 // # No copying occurs if the hash has not changed
 func (s *Syncer) Sync() {
 	if s.CheckChanges() {
-		h.Clog.Info("Syncing", "from", s.target.PathOrigin, "to", s.target.PathDestination)
+		l.Clog.Info("Syncing", "from", s.target.PathOrigin, "to", s.target.PathDestination)
 
 		err := copy.Copy(s.target.PathOrigin, s.target.PathDestination)
 		if err != nil {
-			h.Clog.Error("Error syncing", "error", err)
+			l.Clog.Error("Error syncing", "error", err)
 		}
 	}
 
 	s.target.Hash, err = GetHashFromTarget(s.target)
 	if err != nil {
-		h.Clog.Error("Error calculating hash", "error", err)
+		l.Clog.Error("Error calculating hash", "error", err)
 	}
 }

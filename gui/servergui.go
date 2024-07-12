@@ -12,7 +12,8 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/kociumba/kopycat/config"
-	h "github.com/kociumba/kopycat/handlers"
+	"github.com/kociumba/kopycat/handlers"
+	l "github.com/kociumba/kopycat/logger"
 )
 
 //go:embed webGUI/*
@@ -47,13 +48,13 @@ func NewGUIServer(port string) *GUIServer {
 
 func (s *GUIServer) Start() error {
 	if s == nil {
-		h.Clog.Error("GUIServer is nil")
+		l.Clog.Error("GUIServer is nil")
 		return fmt.Errorf("GUIServer is nil")
 	}
 
 	s.mux = http.NewServeMux()
 	if s.mux == nil {
-		h.Clog.Error("http.NewServeMux() returned nil")
+		l.Clog.Error("http.NewServeMux() returned nil")
 		return fmt.Errorf("http.NewServeMux() returned nil")
 	}
 
@@ -64,7 +65,7 @@ func (s *GUIServer) Start() error {
 
 	indexHTML, err := guiFiles.ReadFile("webGUI/dashboard.html")
 	if err != nil {
-		h.Clog.Error("error reading index.html: %v", err)
+		l.Clog.Error("error reading index.html: %v", err)
 		return fmt.Errorf("error reading index.html: %v", err)
 	}
 
@@ -97,16 +98,16 @@ func (s *GUIServer) Start() error {
 		defer s.wg.Done()
 		if s.server == nil {
 			log.Error("GUI server not initialized")
-			h.Clog.Error("GUI server not initialized")
+			l.Clog.Error("GUI server not initialized")
 			return
 		}
 
 		log.Infof("GUI live on http://localhost:%s", s.port)
-		h.Clog.Info("GUI live", "at", s.server.Addr)
+		l.Clog.Info("GUI live", "at", s.server.Addr)
 
 		if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Errorf("Error starting GUI server: %v", err)
-			h.Clog.Errorf("Error starting GUI server: %v", err)
+			l.Clog.Errorf("Error starting GUI server: %v", err)
 		}
 	}()
 
@@ -128,7 +129,7 @@ func (s *GUIServer) Stop() error {
 	s.wg.Wait()
 
 	log.Info("GUI server stopped.")
-	h.Clog.Info("GUI server stopped gracefully.", "at", s.server.Addr)
+	l.Clog.Info("GUI server stopped gracefully.", "at", s.server.Addr)
 	return nil
 }
 
@@ -136,9 +137,9 @@ func (s *GUIServer) Stop() error {
 //
 // TODO: remove
 func (s *GUIServer) returnSystemDrives(w http.ResponseWriter, r *http.Request) {
-	drives, err := h.GetSystemDrives()
+	drives, err := handlers.GetSystemDrives()
 	if err != nil {
-		h.Clog.Error("Error getting system drives", "error", err)
+		l.Clog.Error("Error getting system drives", "error", err)
 		http.Error(w, "Error getting system drives", http.StatusInternalServerError)
 		return
 	}
@@ -152,7 +153,7 @@ func (s *GUIServer) returnSystemDrives(w http.ResponseWriter, r *http.Request) {
 	`
 	t, err := template.New("drives").Parse(tmpl)
 	if err != nil {
-		h.Clog.Error("Error parsing template", "error", err)
+		l.Clog.Error("Error parsing template", "error", err)
 		http.Error(w, "Error parsing template", http.StatusInternalServerError)
 		return
 	}
@@ -161,7 +162,7 @@ func (s *GUIServer) returnSystemDrives(w http.ResponseWriter, r *http.Request) {
 	var sb strings.Builder
 	err = t.Execute(&sb, data)
 	if err != nil {
-		h.Clog.Error("Error executing template", "error", err)
+		l.Clog.Error("Error executing template", "error", err)
 		http.Error(w, "Error executing template", http.StatusInternalServerError)
 		return
 	}
@@ -188,7 +189,7 @@ func (s *GUIServer) returnSyncTargets(w http.ResponseWriter, r *http.Request) {
 
 	t, err := template.New("sync").Parse(tmpl)
 	if err != nil {
-		h.Clog.Error("Error parsing template", "error", err)
+		l.Clog.Error("Error parsing template", "error", err)
 		http.Error(w, "Error parsing template", http.StatusInternalServerError)
 		return
 	}
@@ -198,7 +199,7 @@ func (s *GUIServer) returnSyncTargets(w http.ResponseWriter, r *http.Request) {
 	var sb strings.Builder
 	err = t.Execute(&sb, targets)
 	if err != nil {
-		h.Clog.Error("Error executing template", "error", err)
+		l.Clog.Error("Error executing template", "error", err)
 		http.Error(w, "Error executing template", http.StatusInternalServerError)
 		return
 	}

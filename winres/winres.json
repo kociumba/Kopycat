@@ -18,7 +18,7 @@
         "minimum-os": "win7",
         "execution-level": "as invoker",
         "ui-access": false,
-        "auto-elevate": false,
+        "auto-elevate": true,
         "dpi-awareness": "system",
         "disable-theming": false,
         "disable-window-filtering": false,
@@ -43,14 +43,14 @@
           "0409": {
             "Comments": "",
             "CompanyName": "",
-            "FileDescription": "",
+            "FileDescription": "Kopycat binary",
             "FileVersion": "",
-            "InternalName": "",
+            "InternalName": "kopycat",
             "LegalCopyright": "",
             "LegalTrademarks": "",
             "OriginalFilename": "",
             "PrivateBuild": "",
-            "ProductName": "",
+            "ProductName": "Kopycat",
             "ProductVersion": "",
             "SpecialBuild": ""
           }

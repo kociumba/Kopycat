@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/kociumba/kopycat/config"
-	h "github.com/kociumba/kopycat/handlers"
+	l "github.com/kociumba/kopycat/logger"
 	"github.com/kociumba/kopycat/sync"
 )
 
@@ -18,7 +18,7 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.Clog.Info("Received add folder request", "origin", req.Origin, "destination", req.Destination)
+	l.Clog.Info("Received add folder request", "origin", req.Origin, "destination", req.Destination)
 
 	// Clean the input paths
 	req.Origin = filepath.Clean(req.Origin)
@@ -33,17 +33,17 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 	// Check if the origin path exists and is a directory
 	info, err := os.Stat(req.Origin)
 	if os.IsNotExist(err) {
-		h.Clog.Error("Origin folder not found", "path", req.Origin)
+		l.Clog.Error("Origin folder not found", "path", req.Origin)
 		http.Error(w, "Origin folder not found", http.StatusNotFound)
 		return
 	}
 	if err != nil {
-		h.Clog.Error("Error resolving origin folder path", "error", err)
+		l.Clog.Error("Error resolving origin folder path", "error", err)
 		http.Error(w, "Error resolving origin folder path", http.StatusInternalServerError)
 		return
 	}
 	if !info.IsDir() {
-		h.Clog.Error("Origin path is not a folder", "path", req.Origin)
+		l.Clog.Error("Origin path is not a folder", "path", req.Origin)
 		http.Error(w, "Origin path is not a folder", http.StatusBadRequest)
 		return
 	}
@@ -56,7 +56,7 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 		if err != nil && os.IsNotExist(err) {
 			continue
 		} else if err != nil {
-			h.Clog.Error("Error resolving folder path", "error", err)
+			l.Clog.Error("Error resolving folder path", "error", err)
 			http.Error(w, "Error resolving folder path", http.StatusInternalServerError)
 			return
 		} else {
@@ -64,7 +64,7 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if checkPath == filepath.VolumeName(req.Origin) {
-		h.Clog.Error("Destination folder not found", "path", req.Destination)
+		l.Clog.Error("Destination folder not found", "path", req.Destination)
 		http.Error(w, "Destination folder not found", http.StatusNotFound)
 		return
 	}
@@ -75,7 +75,7 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 		PathDestination: req.Destination,
 	})
 	if err != nil {
-		h.Clog.Error("Error getting hash from target", "error", err)
+		l.Clog.Error("Error getting hash from target", "error", err)
 		http.Error(w, "Error getting hash from target", http.StatusInternalServerError)
 		return
 	}
@@ -88,7 +88,7 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 	res := FolderPathResponse{FullPath: req.Origin + " -> " + req.Destination}
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(res); err != nil {
-		h.Clog.Error("Error encoding response", "error", err)
+		l.Clog.Error("Error encoding response", "error", err)
 		http.Error(w, "Error encoding response", http.StatusInternalServerError)
 	}
 }

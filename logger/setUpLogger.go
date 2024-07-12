@@ -1,40 +1,18 @@
-package handlers
+package logger
 
 import (
 	"os"
 	"path/filepath"
 
 	"github.com/charmbracelet/log"
-	"github.com/kociumba/kopycat/scheduler"
 )
 
 var (
 	executable string
 	logFile    *os.File
 	Clog       *log.Logger
-	counter    int
 	err        error
-
-	LogCleaner *scheduler.Scheduler
 )
-
-func CheckDirs() {
-	// TODO: the actuall dir syncing logic
-	if counter == 0 {
-		// Clog.Print("\n\n")
-		Clog.Info("Service started with", "pid", os.Getpid())
-	}
-
-	if counter%25 == 0 {
-		Clog.Info("Check scheduled", "log", logFile.Name(), "call", counter)
-	}
-
-	//TODO: check sync folders for changes
-	// get sha256 of files or folders and comapre to last time
-	// if different then sync
-
-	counter++
-}
 
 // Set up the logger and log file relative to the executable
 func Setup() *log.Logger {

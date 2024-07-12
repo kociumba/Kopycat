@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/kociumba/kopycat/config"
-	h "github.com/kociumba/kopycat/handlers"
-	"github.com/kociumba/kopycat/internal"
+	l "github.com/kociumba/kopycat/logger"
+	"github.com/kociumba/kopycat/mainloop"
 )
 
 type IntervalRequest struct {
@@ -25,7 +25,7 @@ func (s *GUIServer) returnCurrentInterval(w http.ResponseWriter, r *http.Request
 	`
 	t, err := template.New("sync").Parse(tmpl)
 	if err != nil {
-		h.Clog.Error("Error parsing template", "error", err)
+		l.Clog.Error("Error parsing template", "error", err)
 		http.Error(w, "Error parsing template", http.StatusInternalServerError)
 		return
 	}
@@ -33,7 +33,7 @@ func (s *GUIServer) returnCurrentInterval(w http.ResponseWriter, r *http.Request
 	var sb strings.Builder
 	err = t.Execute(&sb, data)
 	if err != nil {
-		h.Clog.Error("Error executing template", "error", err)
+		l.Clog.Error("Error executing template", "error", err)
 		http.Error(w, "Error executing template", http.StatusInternalServerError)
 		return
 	}
@@ -47,12 +47,12 @@ func (s *GUIServer) setNewInterval(w http.ResponseWriter, r *http.Request) {
 		Interval int `json:"interval"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		h.Clog.Error("Error decoding request", "error", err)
+		l.Clog.Error("Error decoding request", "error", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	config.ServerConfig.Interval = time.Duration(req.Interval)
-	internal.S.ChangeInterval(config.ServerConfig.Interval)
+	mainloop.S.ChangeInterval(config.ServerConfig.Interval)
 	config.ServerConfig.SaveConfig()
 }
