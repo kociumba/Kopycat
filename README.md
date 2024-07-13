@@ -41,10 +41,10 @@ The port is set to `42069` by default but can be changed with the `-port` flag.
 
 | Example sync targets                              | For use with Kopycat? |
 | :------------------------------------------------ | :-------------------: |
-| ~/ <span style="color:gray;">(Obviously)</span>   | <span style="color:red;">&#x2716;</span> |
-| ~/Pictures <span style="color:gray;">(Typically large)</span>  | <span style="color:red;">&#x2716;</span> |
-| ~/Videos <span style="color:gray;">(Typically large)</span>    | <span style="color:red;">&#x2716;</span> |
-| ~/.config <span style="color:gray;">(Small things like configs)</span> | <span style="color:green;">&#x2714;</span> |
+| ~/ *(Obviously)*   | ❌ |
+| ~/Pictures *(Typically large)*  | ❌ |
+| ~/Videos *(Typically large)*    | ❌ |
+| ~/.config *(Small things like configs)* | ✅ |
 
 ## Note about releases
 
