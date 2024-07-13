@@ -33,7 +33,7 @@ After running Kopycat in any mode, you can open the locally hosted web GUI at ht
 The port is set to `42069` by default but can be changed with the `-port` flag.
 
 > [!IMPORTANT]
-> 🚨 DO NOT USE KOPYCAT TO SYNC WHOLE DRIVES OR LARGE FOLDERS 🚨
+> 🚨 DO NOT USE KOPYCAT TO SYNC WHOLE DRIVES OR LARGE DIRECTORIES 🚨
 > 
 > It was not designed to handle these cases and may malfunction or consume a lot of system resources.
 
