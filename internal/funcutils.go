@@ -10,9 +10,13 @@ import (
 type Args int
 
 const (
+	// The full name with all the packages
 	FullName Args = iota
+	// Only the function name
 	OnlyFunc
+	// Only the package name
 	OnlyPkg
+	// Just the function name and the package it has been declared in
 	Both
 )
 

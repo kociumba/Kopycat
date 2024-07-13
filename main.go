@@ -134,7 +134,9 @@ func main() {
 	if len(os.Args) > 1 {
 		command := os.Args[1]
 
-		controller.ServiceController(command, ser)
+		ctrl := controller.NewServiceController(ser)
+
+		ctrl.ServiceControllerSwitch(command)
 
 		return
 	}

@@ -7,6 +7,9 @@ import (
 	"runtime"
 )
 
+// This is kinda redundant now
+//
+// TODO: remove or find use
 func GetSystemDrives() ([]string, error) {
 	drives := []string{}
 	switch runtime.GOOS {
