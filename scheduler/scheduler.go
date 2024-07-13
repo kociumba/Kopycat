@@ -8,6 +8,9 @@ import (
 	"github.com/kociumba/kopycat/internal"
 )
 
+// Don't use directly, to use call:
+//
+//	s := scheduler.NewScheduler(yourCallback)
 type Scheduler struct {
 	intervalChan chan time.Duration
 	wg           sync.WaitGroup
@@ -53,6 +56,7 @@ func (s *Scheduler) Stop() {
 }
 
 // Call with a time.Duration to change the interval at witch the scheduler runs
+//
 // Had to force it to be non blocking as it would block in some scenarios
 func (s *Scheduler) ChangeInterval(newInterval time.Duration) {
 	go func() {

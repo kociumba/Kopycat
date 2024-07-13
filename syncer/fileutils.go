@@ -32,8 +32,13 @@ func Copy(src string, dst string) error {
 				return err
 			}
 		} else {
-			if err = copyFile(srcfp, dstfp); err != nil {
+			// Check if file exists in destination and compare hashes
+			if dstHash, srcHash, err := CompareHashes(srcfp, dstfp); err != nil {
 				return err
+			} else if dstHash != srcHash {
+				if err = copyFile(srcfp, dstfp); err != nil {
+					return err
+				}
 			}
 		}
 	}

@@ -4,15 +4,10 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"html/template"
 	"net/http"
-	"runtime"
-	"strings"
 	"sync"
 
 	"github.com/charmbracelet/log"
-	"github.com/kociumba/kopycat/config"
-	"github.com/kociumba/kopycat/handlers"
 	l "github.com/kociumba/kopycat/logger"
 )
 
@@ -63,6 +58,7 @@ func (s *GUIServer) Start() error {
 		Handler: s.mux,
 	}
 
+	// Experiment with the afero.NewHttpFs might be much better than just embedding
 	indexHTML, err := guiFiles.ReadFile("webGUI/dashboard.html")
 	if err != nil {
 		l.Clog.Error("error reading index.html: %v", err)
@@ -131,82 +127,4 @@ func (s *GUIServer) Stop() error {
 	log.Info("GUI server stopped.")
 	l.Clog.Info("GUI server stopped gracefully.", "at", s.server.Addr)
 	return nil
-}
-
-// DEPRECATED
-//
-// TODO: remove
-func (s *GUIServer) returnSystemDrives(w http.ResponseWriter, r *http.Request) {
-	drives, err := handlers.GetSystemDrives()
-	if err != nil {
-		l.Clog.Error("Error getting system drives", "error", err)
-		http.Error(w, "Error getting system drives", http.StatusInternalServerError)
-		return
-	}
-
-	tmpl := `
-		{{range .Drives}}
-		<div class="drive">
-			<input type="radio" name="drives-option" value="{{.}}"><span>{{.}}</span>
-		</div>
-		{{end}}
-	`
-	t, err := template.New("drives").Parse(tmpl)
-	if err != nil {
-		l.Clog.Error("Error parsing template", "error", err)
-		http.Error(w, "Error parsing template", http.StatusInternalServerError)
-		return
-	}
-
-	data := SystemDriveResponse{Drives: drives}
-	var sb strings.Builder
-	err = t.Execute(&sb, data)
-	if err != nil {
-		l.Clog.Error("Error executing template", "error", err)
-		http.Error(w, "Error executing template", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(sb.String()))
-}
-
-func (s *GUIServer) returnSyncTargets(w http.ResponseWriter, r *http.Request) {
-	data := config.NewSyncConfig()
-	data.ReadConfig()
-
-	targets := data.ReturnTargets()
-
-	tmpl := `
-	{{range .}}
-		<div class="target-item">
-			<span>{{.PathOrigin}} -> {{.PathDestination}}
-			<button class="button" onclick="deleteTarget('{{.PathOrigin}}', '{{.PathDestination}}')">Delete</button>
-			</span>
-		</div>
-	{{end}}
-	`
-
-	t, err := template.New("sync").Parse(tmpl)
-	if err != nil {
-		l.Clog.Error("Error parsing template", "error", err)
-		http.Error(w, "Error parsing template", http.StatusInternalServerError)
-		return
-	}
-
-	// h.Clog.Info("Targets:", "targets", targets)
-
-	var sb strings.Builder
-	err = t.Execute(&sb, targets)
-	if err != nil {
-		l.Clog.Error("Error executing template", "error", err)
-		http.Error(w, "Error executing template", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(sb.String()))
-
-	//Testing to see if this works
-	go runtime.GC()
 }

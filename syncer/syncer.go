@@ -1,7 +1,11 @@
 package syncer
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"io"
+	"os"
 	"runtime"
 
 	"github.com/MShekow/directory-checksum/directory_checksum"
@@ -80,7 +84,9 @@ func NewSyncer(target config.Target) *Syncer {
 // 	return encodedHash, nil
 // }
 
-// This version relies on 3rd party packages and a virtual filesystem
+// # This version relies on 3rd party packages and a virtual filesystem
+//
+// Get a general checksum of a whole directory, which is derived from the files in it
 func GetHashFromTarget(target config.Target) (string, error) {
 	// Initialize an in-memory filesystem
 	fs := afero.NewOsFs()
@@ -100,8 +106,53 @@ func GetHashFromTarget(target config.Target) (string, error) {
 	return checksum, nil
 }
 
+// The same as
+//
+//	GetHashFromTarget(config.Target)
+//
+// But doesn't require the use of config.Target
 func GetHashFromPath(path string) (string, error) {
 	return GetHashFromTarget(config.Target{PathOrigin: path})
+}
+
+// Get a sha256 from a single file
+//
+// Used in conjunction with
+//
+//	GetHashFromPath() and GetHashFromTarget()
+//
+// To check which files to copy over when syncing
+func GetHashFromFile(path string) (string, error) {
+	hash := sha256.New()
+	h, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer h.Close()
+
+	if _, err := io.Copy(hash, h); err != nil {
+		return "", err
+	}
+
+	hashInBytes := hash.Sum(nil)
+	encodedHash := hex.EncodeToString(hashInBytes)
+	return encodedHash, nil
+}
+
+func CompareHashes(src, dst string) (string, string, error) {
+	srcHash, err := GetHashFromFile(src)
+	if err != nil {
+		return "", "", err
+	}
+
+	dstHash := ""
+	if _, err := os.Stat(dst); err == nil {
+		if dstHash, err = GetHashFromFile(dst); err != nil {
+			return "", "", err
+		}
+	}
+
+	return dstHash, srcHash, nil
 }
 
 // if there is a change, return true
