@@ -1,5 +1,7 @@
 # Kopycat - Easy to use directory synchronization
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9b660edcea374caea2d8f417bbfa5cac)](https://app.codacy.com/gh/kociumba/Kopycat?utm_source=github.com&utm_medium=referral&utm_content=kociumba/Kopycat&utm_campaign=Badge_Grade)
+
 Kopycat is a cross-platform directory synchronization tool. It can run as a background service, so you don't have to worry about leaving it open or accidentally closing it. It has all the features you'd expect from a sync tool 😎
 
 ## 🚨 Compatibility and usability 🚨
