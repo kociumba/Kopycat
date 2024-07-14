@@ -2,7 +2,7 @@
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/a852d0bff81d476caca531dc2ebb3a14)](https://app.codacy.com/gh/kociumba/Kopycat/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 ![GitHub commits since latest release](https://img.shields.io/github/commits-since/kociumba/kopycat/latest)
-![GitHub branch check runs](https://img.shields.io/github/check-runs/kociumba/kopycat/main)
+[![Release](https://github.com/kociumba/Kopycat/actions/workflows/release.yml/badge.svg)](https://github.com/kociumba/Kopycat/actions/workflows/release.yml)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/kociumba/kopycat)
 ![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/kociumba)
 <!-- Add downloads later -->
