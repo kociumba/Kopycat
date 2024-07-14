@@ -11,10 +11,15 @@ import (
 	"github.com/kociumba/kopycat/controller"
 	"github.com/kociumba/kopycat/gui"
 	logSetup "github.com/kociumba/kopycat/logger"
+	"github.com/kociumba/kopycat/scheduler"
 	"github.com/kociumba/kopycat/tasks"
 )
 
-var logger service.Logger
+var (
+	logger service.Logger
+
+	LogCleaner *scheduler.Scheduler
+)
 
 type program struct {
 	exit chan struct{}
@@ -46,6 +51,18 @@ func (p *program) run() {
 	//Always call first to init the file logger
 	logSetup.Setup()
 
+	// This is unfortunetly unusable right now
+	//
+	// Clean old log files to avoid cluttering the disk with useless
+	// Set up a scheduler to clean old log files
+	LogCleaner = scheduler.NewScheduler(func() {
+		log.Info("Cleaner scheduled", "log", logSetup.LogFile.Name())
+		if err := logSetup.CleanOldLogs(logSetup.MutexLog); err != nil {
+			logSetup.Clog.Warn(err)
+		}
+	})
+	LogCleaner.ChangeInterval(time.Minute * 10)
+
 	// Load config
 	configManager := config.NewSyncConfig()
 	configManager.ReadConfig()
@@ -70,7 +87,7 @@ func (p *program) run() {
 	// start log cleaner
 	// to make this actually work i would have to mutex the log file
 	// and intercept the charmbracelet/log package
-	// handlers.LogCleaner.Start()
+	LogCleaner.Start()
 }
 
 func (p *program) Stop(service service.Service) error {
@@ -79,6 +96,7 @@ func (p *program) Stop(service service.Service) error {
 	// Stop all running tasks
 	tasks.S.Stop()
 	service.Stop()
+	LogCleaner.Stop()
 
 	// Stop web GUI
 	err := guiServer.Stop()

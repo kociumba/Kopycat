@@ -4,7 +4,7 @@ Kopycat is a cross-platform directory synchronization tool. It can run as a back
 
 ## 🚨 Compatibility 🚨
 
-Right now Kopycat has only been tested on Windows, if you want to contribute by testing or improving it on macOS or Linux please [open an issue](https://github.com/kociumba/kopycat/issues).
+**Right now Kopycat has only been tested on Windows, if you want to contribute by testing or improving it on macOS or Linux please [open an issue](https://github.com/kociumba/kopycat/issues).**
 
 ## Usage
 

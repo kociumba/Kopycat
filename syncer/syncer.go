@@ -171,6 +171,33 @@ func (s *Syncer) CheckChanges() bool {
 //
 // # No copying occurs if the hash has not changed
 func (s *Syncer) Sync() {
+	if s.target.Hash == "" {
+		s.target.Hash, err = GetHashFromTarget(s.target)
+		if err != nil {
+			l.Clog.Error("Error calculating hash", "error", err)
+			log.Error("Error calculating hash", "error", err)
+		}
+
+		// Update it in the config
+		index := -1
+		for i, target := range config.ServerConfig.Targets {
+			if target.PathOrigin == s.target.PathOrigin && target.PathDestination == s.target.PathDestination {
+				index = i
+				break
+			}
+		}
+
+		if index != -1 {
+			config.ServerConfig.Targets[index].Hash = s.target.Hash
+			err = config.ServerConfig.SaveConfig()
+			if err != nil {
+				l.Clog.Error("Error saving config", "error", err)
+				log.Error("Error saving config", "error", err)
+			}
+		}
+
+	}
+
 	if s.CheckChanges() {
 		l.Clog.Info("Syncing", "from", s.target.PathOrigin, "to", s.target.PathDestination)
 		log.Info("Syncing", "from", s.target.PathOrigin, "to", s.target.PathDestination)

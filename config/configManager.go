@@ -107,10 +107,12 @@ func (c *SyncConfig) ReadConfig() {
 	// h.Clog.Info(ServerConfig)
 }
 
+// Fuckass cleancode type stuff but usefull here
 func (c *SyncConfig) ReturnTargets() []Target {
 	return c.Targets
 }
 
+// Same as above just for a different field
 func (c *SyncConfig) ReturnInterval() time.Duration {
 	return c.Interval
 }

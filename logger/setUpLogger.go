@@ -1,66 +1,114 @@
 package logger
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/charmbracelet/log"
 )
 
 var (
 	executable string
+	MutexLog   *logFileMutex
+	LogPath    string
 	LogFile    *os.File
 	Clog       *log.Logger
 	err        error
 )
 
-// Set up the logger and log file relative to the executable
-func Setup() *log.Logger {
-	log.SetReportCaller(true)
+type logFileMutex struct {
+	file  *os.File
+	mutex *sync.Mutex
+}
 
+// Setup sets up the logger and log file relative to the executable
+func Setup() *log.Logger {
 	executable, err = os.Executable()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	execDir := filepath.Dir(executable)
-	logDir := filepath.Join(execDir, "logs")
-	logPath := filepath.Join(logDir, "Kopycat.log")
-
-	// I should run this continuously in scheduler but for that i would need a mutex on the log file
-	//
-	// Clean old log files to avoid cluttering the disk with useless logs
-	if err = cleanOldLogs(logPath); err != nil {
-		log.Fatal(err)
-	}
-
-	if err = os.MkdirAll(logDir, 0755); err != nil {
-		log.Fatal(err)
-	}
-
-	LogFile, err = os.OpenFile(logPath, os.O_CREATE|os.O_APPEND, 0666)
+	LogPath = filepath.Join(filepath.Dir(executable), "Kopycat.log")
+	MutexLog, err = GetLogFile()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Clean old log files to avoid cluttering the disk with useless logs
+	if err = CleanOldLogs(MutexLog); err != nil {
+		log.Warn(err)
+	}
+
 	// Initialize the logger with the file output
-	Clog = log.New(LogFile)
+	Clog = log.New(MutexLog)
 	Clog.SetReportTimestamp(true)
 	Clog.SetTimeFormat("2006-01-02 15:04:05")
 	Clog.SetReportCaller(true)
 
-	// This is unfortunetly unusable right now
-	//
-	// Clean old log files to avoid cluttering the disk with useless
-	// Set up a scheduler to clean old log files
-	// LogCleaner = scheduler.NewScheduler(func() {
-	// 	if err = cleanOldLogs(logPath); err != nil {
-	// 		Clog.Warn(err)
-	// 	}
-	// })
-	// LogCleaner.ChangeInterval(time.Minute * 5)
-
-	log.Info("Logging to", "path", logPath)
+	log.Info("Logging to", "path", LogPath)
 
 	return Clog
+}
+
+// GetLogFile returns an io.Writer with a mutex on it so that different functions can access the same file
+func GetLogFile() (*logFileMutex, error) {
+	execDir := filepath.Dir(executable)
+	logDir := filepath.Join(execDir, "logs")
+	LogPath = filepath.Join(logDir, "Kopycat.log")
+
+	if err = os.MkdirAll(logDir, 0755); err != nil {
+		return nil, err
+	}
+
+	LogFile, err = os.OpenFile(LogPath, os.O_CREATE|os.O_RDWR, 0666)
+	if err != nil {
+		return nil, err
+	}
+
+	return &logFileMutex{file: LogFile, mutex: &sync.Mutex{}}, nil
+}
+
+func (l *logFileMutex) Write(p []byte) (int, error) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	return l.file.Write(p)
+}
+
+func (l *logFileMutex) Read(p []byte) (int, error) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	return l.file.Read(p)
+}
+
+func (l *logFileMutex) Truncate(size int64) error {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	return l.file.Truncate(size)
+}
+
+func (l *logFileMutex) Seek(offset int64, whence int) (int64, error) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	return l.file.Seek(offset, whence)
+}
+
+func (l *logFileMutex) WriteString(s string) (int, error) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	return l.file.WriteString(s)
+}
+
+func (l *logFileMutex) ReadIntoBuffer() (bytes.Buffer, error) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
+	buf := new(bytes.Buffer)
+	if _, err := buf.ReadFrom(l.file); err != nil {
+		log.Error("Failed to read log file", "error", err)
+		return *buf, err
+	}
+
+	return *buf, nil
 }
