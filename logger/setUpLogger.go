@@ -41,6 +41,11 @@ func Setup() *log.Logger {
 		log.Warn(err)
 	}
 
+	// This go ommited somewhere in the last commit
+	log.SetReportCaller(true)
+	log.SetReportTimestamp(true)
+	log.SetTimeFormat("2006-01-02 15:04:05")
+
 	// Initialize the logger with the file output
 	Clog = log.New(MutexLog)
 	Clog.SetReportTimestamp(true)

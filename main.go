@@ -88,6 +88,11 @@ func (p *program) run() {
 	// to make this actually work i would have to mutex the log file
 	// and intercept the charmbracelet/log package
 	LogCleaner.Start()
+
+	// Make sure the sync targets are copied when first added
+	for _, target := range config.ServerConfig.Targets {
+		tasks.InitialCopy(target)
+	}
 }
 
 func (p *program) Stop(service service.Service) error {
@@ -97,6 +102,9 @@ func (p *program) Stop(service service.Service) error {
 	tasks.S.Stop()
 	service.Stop()
 	LogCleaner.Stop()
+
+	// Save the config to file
+	config.ServerConfig.SaveConfig()
 
 	// Stop web GUI
 	err := guiServer.Stop()

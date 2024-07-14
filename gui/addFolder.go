@@ -9,6 +9,7 @@ import (
 	"github.com/kociumba/kopycat/config"
 	l "github.com/kociumba/kopycat/logger"
 	"github.com/kociumba/kopycat/syncer"
+	"github.com/kociumba/kopycat/tasks"
 )
 
 func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
@@ -83,6 +84,13 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 	// Add the folder to sync
 	config.ServerConfig.AddToSync(req.Origin, req.Destination, hash)
 	// config.ServerConfig.SaveConfig()
+
+	// Make sure the files are copied on addition
+	tasks.InitialCopy(config.Target{
+		PathOrigin:      req.Origin,
+		PathDestination: req.Destination,
+		Hash:            hash,
+	})
 
 	// Prepare and send the response
 	res := FolderPathResponse{FullPath: req.Origin + " -> " + req.Destination}

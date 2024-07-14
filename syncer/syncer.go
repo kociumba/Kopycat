@@ -198,6 +198,14 @@ func (s *Syncer) Sync() {
 
 	}
 
+	if !IsTargetInDestination(s.target) {
+		err := Copy(s.target.PathOrigin, s.target.PathDestination)
+		if err != nil {
+			l.Clog.Error("Error copying", "error", err)
+			log.Error("Error copying", "error", err)
+		}
+	}
+
 	if s.CheckChanges() {
 		l.Clog.Info("Syncing", "from", s.target.PathOrigin, "to", s.target.PathDestination)
 		log.Info("Syncing", "from", s.target.PathOrigin, "to", s.target.PathDestination)

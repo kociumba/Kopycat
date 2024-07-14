@@ -2,20 +2,26 @@
 
 Kopycat is a cross-platform directory synchronization tool. It can run as a background service, so you don't have to worry about leaving it open or accidentally closing it. It has all the features you'd expect from a sync tool 😎
 
-## 🚨 Compatibility 🚨
+## 🚨 Compatibility and usability 🚨
+
+Kopycat does work in it's current state but it's nowhere near being production ready yet.
+When the planned ease of use and readyness of Kopycat are met, it will be released as v1.0.0.
+
+If the current realese version is lower than v1.0.0 be ready for some breaking changes and difficulties 
+when using Kopycat.
 
 **Right now Kopycat has only been tested on Windows, if you want to contribute by testing or improving it on macOS or Linux please [open an issue](https://github.com/kociumba/kopycat/issues).**
 
 ## Usage
 
-To use Kopycat, download the latest release from [releases](https://github.com/kociumba/kopycat/releases) and run it.
+To use Kopycat, download the latest release from the [releases page](https://github.com/kociumba/kopycat/releases) and run it.
 
-By default, Kopycat will run in terminal mode where it's fully functional and works like any other app.
+By default, Kopycat runs in terminal mode where it is fully functional and operates like any other application.
 
 > [!NOTE]
 > Please keep in mind all configuration files and logs are stored relative to the binary, so make sure you aren't running it from `Downloads` 💀
 
-To install Kopycat as a service, pass the `install` flag (if the service is already installed, `install` will try to reinstall it).
+To install Kopycat as a service, use the `install` flag (if the service is already installed, `install` will attempt to reinstall it).
 
 > [!WARNING]
 > This will require admin privileges.
@@ -57,5 +63,5 @@ This isn't a complete list by any means, but it should serve as a baseline of wh
 - [x] Run as a service (tested on Windows, theoretically should be compatible with Linux and macOS)
 - [x] Locally hosted web GUI for configuration
 - [x] Terminal mode when running as a normal app
-- [ ] Control over resource usage
-- [ ] Decoupling log cleaning from the start or restart of the app
+- [ ] Control over resource usage (this is a hard one and I'm not entirely sure I will be able to achive it in GO)
+- [x] Decoupling log cleaning from the start or restart of the app

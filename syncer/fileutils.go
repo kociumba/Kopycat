@@ -4,6 +4,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/kociumba/kopycat/config"
 )
 
 // Copies the whole directory recursively
@@ -69,4 +71,24 @@ func copyFile(src, dst string) error {
 
 	err = out.Sync()
 	return err
+}
+
+func IsTargetInDestination(target config.Target) bool {
+	folderName := filepath.Base(target.PathOrigin)
+
+	for _, t := range config.ServerConfig.Targets {
+		err := filepath.WalkDir(filepath.Dir(t.PathDestination), func(path string, d os.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if d.IsDir() && d.Name() == folderName {
+				return filepath.SkipDir
+			}
+			return nil
+		})
+		if err == nil {
+			return true
+		}
+	}
+	return false
 }

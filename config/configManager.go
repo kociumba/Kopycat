@@ -147,7 +147,7 @@ func (c *SyncConfig) CreateConfig(configPath, configDir string) {
 	c.ReadConfig()
 }
 
-func (c *SyncConfig) SaveConfig() error {
+func (c *SyncConfig) SaveConfigUnformatted() error {
 	if c == nil {
 		return fmt.Errorf("SyncConfig is nil")
 	}
@@ -167,6 +167,33 @@ func (c *SyncConfig) SaveConfig() error {
 	}
 
 	// h.Clog.Info("Config saved", "as", c)
+
+	return nil
+}
+
+func (c *SyncConfig) SaveConfig() error {
+	if c == nil {
+		return fmt.Errorf("SyncConfig is nil")
+	}
+
+	configPath, _ := GetRelativePath()
+
+	file, err := os.Create(configPath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Format JSON with indentation for readability
+	formattedConfig, err := json.MarshalIndent(&ServerConfig, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	_, err = file.Write(formattedConfig)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	// logRetentionPeriod = 1 * time.Hour
-	logRetentionPeriod = 20 * time.Second
-	dateTimeFormat     = "2006-01-02 15:04:05"
+	logRetentionPeriod = 1 * time.Hour // Left the wrong one in last commit xd
+	// logRetentionPeriod = 20 * time.Second
+	dateTimeFormat = "2006-01-02 15:04:05"
 )
 
 // CleanOldLogs cleans old log entries from the log file
