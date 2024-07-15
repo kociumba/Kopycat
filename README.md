@@ -75,3 +75,13 @@ This isn't a complete list by any means, but it should serve as a baseline of wh
 - [x] Terminal mode when running as a normal app
 - [ ] Control over resource usage (this is a hard one and I'm not entirely sure I will be able to achive it in GO)
 - [x] Decoupling log cleaning from the start or restart of the app
+
+## Final notes
+
+At the moment, the web GUI won't function without an internet connection as it uses [HTMX](https://htmx.org/) 
+and [jQuery](https://jquery.com/) to function properly.
+
+This was a short sighted decision that made the development much easier.
+
+The rest of the app remains functional.
+The only caveat being you would have to configure it by sending manual server requests or in the `config/config.json` file.

@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"sync"
 
@@ -59,16 +60,28 @@ func (s *GUIServer) Start() error {
 	}
 
 	// Experiment with the afero.NewHttpFs might be much better than just embedding
+	//
+	// NOPE 💀 (at least not easly)
 	indexHTML, err := guiFiles.ReadFile("webGUI/dashboard.html")
 	if err != nil {
-		l.Clog.Error("error reading index.html: %v", err)
-		return fmt.Errorf("error reading index.html: %v", err)
+		l.Clog.Error("error reading dashboard.html: %v", err)
+		return fmt.Errorf("error reading dashboard.html: %v", err)
 	}
 
 	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
 		w.Write(indexHTML)
 	})
+
+	// Create a new file system rooted at webGUI/static
+	staticFs, err := fs.Sub(guiFiles, "webGUI/static")
+	if err != nil {
+		l.Clog.Error("error creating static file system: %v", err)
+		return fmt.Errorf("error creating static file system: %v", err)
+	}
+
+	// Serve the static files using http.FileServer
+	s.mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFs))))
 
 	s.mux.HandleFunc("/add-folder", s.handleAddFolder)
 	s.mux.HandleFunc("/delete-folder", s.handleDeleteFolder)
