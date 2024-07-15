@@ -1,5 +1,10 @@
 # Kopycat - Easy to use directory synchronization
 
+<p align="center">
+  <img src="/winres/icon.png" alt="Icon">
+</p>
+
+
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/a852d0bff81d476caca531dc2ebb3a14)](https://app.codacy.com/gh/kociumba/Kopycat/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 ![GitHub commits since latest release](https://img.shields.io/github/commits-since/kociumba/kopycat/latest)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/kociumba/kopycat/total)
@@ -11,11 +16,9 @@ Kopycat is a cross-platform directory synchronization tool. It can run as a back
 
 ## 🚨 Compatibility and usability 🚨
 
-Kopycat does work in it's current state but it's nowhere near being production ready yet.
-When the planned ease of use and readyness of Kopycat are met, it will be released as v1.0.0.
+Kopycat is functional in its current state but is not yet production-ready. When it meets the planned ease of use and readiness, it will be released as v1.0.0.
 
-If the current realese version is lower than v1.0.0 be ready for some breaking changes and difficulties 
-when using Kopycat.
+If the current release version is lower than v1.0.0, be prepared for potential breaking changes and difficulties when using Kopycat.
 
 **Right now Kopycat has only been tested on Windows, if you want to contribute by testing or improving it on macOS or Linux please [open an issue](https://github.com/kociumba/kopycat/issues).**
 
