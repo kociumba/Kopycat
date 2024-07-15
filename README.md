@@ -84,4 +84,4 @@ and [jQuery](https://jquery.com/) to function properly.
 This was a short sighted decision that made the development much easier.
 
 The rest of the app remains functional.
-The only caveat being you would have to configure it by sending manual server requests or in the `config/config.json` file.
+The only caveat being you would have to configure it by sending manual server requests or edit the `config/config.json` file.
