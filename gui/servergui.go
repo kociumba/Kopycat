@@ -62,10 +62,10 @@ func (s *GUIServer) Start() error {
 	// Experiment with the afero.NewHttpFs might be much better than just embedding
 	//
 	// NOPE 💀 (at least not easly)
-	indexHTML, err := guiFiles.ReadFile("webGUI/dashboard.html")
+	indexHTML, err := guiFiles.ReadFile("webGUI/index.html")
 	if err != nil {
-		l.Clog.Error("error reading dashboard.html: %v", err)
-		return fmt.Errorf("error reading dashboard.html: %v", err)
+		l.Clog.Error("error reading index.html: %v", err)
+		return fmt.Errorf("error reading index.html: %v", err)
 	}
 
 	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

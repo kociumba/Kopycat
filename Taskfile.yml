@@ -12,3 +12,6 @@ tasks:
   rich-test:
     cmds:
     - go test -v -json ./... | go run github.com/mfridman/tparse@latest -all
+  run-gui:
+    cmds:
+    - vite gui/webGUI

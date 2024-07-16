@@ -35,14 +35,32 @@
                 </section> -->
                 <section class="folders">
                     <h2>Synced Folders</h2>
-                    <div>
-                        <label for="originPath">Enter Origin Folder Path:</label>
-                        <input type="text" id="originPath" placeholder="root/users/username/origin">
-                        <label for="destinationPath">Enter Destination Folder Path:</label>
-                        <input type="text" id="destinationPath" placeholder="root/users/username/destination">
-                        <a class="button" onclick="submitFiles()">Update Sync</a>
-                        <!-- <a class="button" onclick="addfolder('C:/Users/', 'D:/backup')">Test button</a> -->
+                    <div class="tabs-menu">
+                        <button data-tab="tab1" class="active-tab">Manual Config</button>
+                        <button data-tab="tab2">Mirror on Drive</button>
+                        <div class="tab-underline"></div>
                     </div>
+                    
+                    <!-- manual destination config -->
+                    <div id="tab1" class="tab active">
+                        <label for="originPath1">Enter Origin Folder Path:</label>
+                        <input type="text" id="originPath1" placeholder="root/users/username/origin">
+                        <label for="destinationPath1">Enter Destination Folder Path:</label>
+                        <input type="text" id="destinationPath1" placeholder="root/users/username/destination">
+                        <a class="button" onclick="submitFiles()">Update Sync</a>
+                    </div>
+                    
+                    <!-- auto mirroring on other drives -->
+                    <div id="tab2" class="tab">
+                        <label for="originPath2">Enter Origin Folder Path:</label>
+                        <input type="text" id="originPath2" placeholder="root/users/username/origin">
+                        <label for="drives-list">Pick the drive to sync to with the same directory structure:</label>
+                        <div id="drives-list" hx-get="/get-system-drives" hx-trigger="load" hx-target="#drives-list">
+                            <div class="loading-placeholder"></div>
+                        </div>
+                        <a class="button" onclick="submitFiles()">Update Sync</a>
+                    </div>
+                    
                     <h2>Manage Sync Targets</h2>
                     <!-- <div id="targets-container" hx-get="/get-sync-targets" hx-trigger="load click submitFiles"
                         hx-target="#targets-container"> -->

@@ -1,3 +1,49 @@
+$(document).ready(function(){
+    const $tabsMenu = $('.tabs-menu');
+    const $tabUnderline = $('.tab-underline');
+
+    function setActiveTab($tab, animate = true) {
+        const tabId = $tab.data('tab');
+        $('.tab').removeClass('active');
+        $('#' + tabId).addClass('active');
+        $('.tabs-menu button').removeClass('active-tab');
+        $tab.addClass('active-tab');
+
+        // Calculate the correct width and position
+        const width = $tab.outerWidth();
+        const left = $tab.position().left;
+
+        // Animate or immediately set the underline
+        if (animate) {
+            $tabUnderline.css({
+                'width': width + 4,
+                'transform': `translateX(${left}px)`
+            });
+        } else {
+            $tabUnderline.css({
+                'width': width,
+                'transform': `translateX(${left}px)`,
+                'transition': 'none'
+            });
+            // Force a reflow to apply the changes immediately
+            $tabUnderline[0].offsetHeight;
+            $tabUnderline.css('transition', '');
+        }
+    }
+
+    $('.tabs-menu button').click(function(){
+        setActiveTab($(this));
+    });
+
+    // Set initial active tab without animation
+    setActiveTab($('.tabs-menu button:first'), false);
+
+    // Adjust underline on window resize
+    $(window).resize(function() {
+        setActiveTab($('.tabs-menu button.active-tab'), false);
+    });
+});
+
 let selectedFolderPath = '';
 
 function submitFiles() {
