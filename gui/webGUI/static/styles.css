@@ -10,7 +10,7 @@
     --header-footer-bg: #2c2c2c;
 }
 
-:root::selection {
+*::selection {
     background-color: var(--primary-color);
     color: var(--bg-color);
 }
@@ -234,7 +234,7 @@ ul li {
     bottom: -2px;
     left: 0;
     height: 2px;
-    background: var(--primary-color);
+    background: var(--secondary-color);
     transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
 }
 
@@ -244,8 +244,8 @@ ul li {
     padding: 20px;
     border-radius: 0 var(--radius) var(--radius) var(--radius);
     border: 2px solid var(--primary-color);
-    border-top: none;
-    margin-top: -2px;
+    /*border-top: none;*/
+    /* margin-top: -2px; */
 }
 
 .tab.active {
@@ -264,4 +264,141 @@ ul li {
 
 .tab-underline.active {
     transform: scaleX(1);
+}
+
+.main-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.main-tabs button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    background: var(--card-bg-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.main-tabs button.active-main-tab {
+    background: var(--primary-color);
+}
+
+.main-tab-content {
+    display: none;
+}
+
+.main-tab-content.active {
+    display: block;
+}
+
+.folder-tabs {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.folder-tabs button {
+    padding: 8px 16px;
+    background: var(--card-bg-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+}
+
+.folder-tabs button.active-folder-tab {
+    background: var(--primary-color);
+}
+
+.folder-tabs.button:hover {
+    background-color: var(--secondary-color);
+}
+
+.folder-tab-content {
+    display: none;
+}
+
+.folder-tab-content.active {
+    display: block;
+}
+
+#drives-list {
+    margin-bottom: 5px;
+}
+
+/* #log-display {
+    background-color: var(--card-bg-color);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+} */
+
+#logs-hosted {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    padding: 15px;
+    border-radius: var(--radius);
+    border: 1px solid var(--primary-color);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.language-log::selection {
+    color: var(--bg-color);
+    background-color: var(--text-color);
+}
+
+/* Log syntax highlighting */
+.language-log .date { color: #c93e84; }
+.language-log .date::selection { color: var(--text-color); background-color: #c93e84; }
+
+.language-log .time { color: #c93e84; }
+.language-log .time::selection { color: var(--text-color); background-color: #c93e84; }
+
+.language-log .level-info { color: #5fffd7; }
+.language-log .level-info::selection { color: var(--bg-color); background-color: #5fffd7; }
+
+.language-log .level-warn { color: #ffd207; }
+.language-log .level-warn::selection { color: var(--bg-color); background-color: #ffd207; }
+
+.language-log .level-error { color: #dc3545; }
+.language-log .level-error::selection { color: var(--bg-color); background-color: #dc3545; }
+
+.language-log .level-debug { color: #690dc0; }
+.language-log .level-debug::selection { color: var(--text-color); background-color: #690dc0; }
+
+.language-log .module { color: #696969; }
+.language-log .module::selection { color: var(--text-color); background-color: #696969; }
+
+.language-log .message { color: var(--text-color); }
+.language-log .message::selection { 
+    color: var(--bg-color); 
+    background-color: var(--text-color);
+}
+
+#logs-hosted::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+#logs-hosted::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 5px;
+}
+
+#logs-hosted::-webkit-scrollbar-track {
+    background: var(--card-bg-color);
+    border-radius: 5px;
 }

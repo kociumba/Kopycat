@@ -11,11 +11,17 @@ import (
 
 var (
 	executable string
-	MutexLog   *logFileMutex
-	LogPath    string
-	LogFile    *os.File
-	Clog       *log.Logger
-	err        error
+
+	// Always assume the pointer is not at the start of the file
+	//
+	// Before using call:
+	//
+	//	MutexLog.Seek(0, io.SeekStart)
+	MutexLog *logFileMutex
+	LogPath  string
+	LogFile  *os.File
+	Clog     *log.Logger
+	err      error
 )
 
 type logFileMutex struct {
@@ -34,6 +40,10 @@ func Setup() *log.Logger {
 	MutexLog, err = GetLogFile()
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if MutexLog == nil {
+		log.Info("MutexLog is nil")
 	}
 
 	// Clean old log files to avoid cluttering the disk with useless logs

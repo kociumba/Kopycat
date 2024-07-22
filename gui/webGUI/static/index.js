@@ -1,46 +1,69 @@
-$(document).ready(function(){
-    const $tabsMenu = $('.tabs-menu');
-    const $tabUnderline = $('.tab-underline');
+// let lineNumber = 0;
 
-    function setActiveTab($tab, animate = true) {
-        const tabId = $tab.data('tab');
-        $('.tab').removeClass('active');
-        $('#' + tabId).addClass('active');
-        $('.tabs-menu button').removeClass('active-tab');
-        $tab.addClass('active-tab');
+$(() => {
+    const LogDisplay = (() => {
+        let $codeElement;
+        let lastLogContent = '';
 
-        // Calculate the correct width and position
-        const width = $tab.outerWidth();
-        const left = $tab.position().left;
-
-        // Animate or immediately set the underline
-        if (animate) {
-            $tabUnderline.css({
-                'width': width + 4,
-                'transform': `translateX(${left}px)`
+        function init() {
+            $('#log-section').load('/static/logDisplay.html', () => {
+                $codeElement = $('#logs-hosted code');
+                refreshLogs();
+                setInterval(refreshLogs, 1000);
             });
-        } else {
-            $tabUnderline.css({
-                'width': width,
-                'transform': `translateX(${left}px)`,
-                'transition': 'none'
-            });
-            // Force a reflow to apply the changes immediately
-            $tabUnderline[0].offsetHeight;
-            $tabUnderline.css('transition', '');
         }
-    }
 
-    $('.tabs-menu button').click(function(){
-        setActiveTab($(this));
+        function refreshLogs() {
+            $.ajax({
+                url: '/get-logs',
+                method: 'GET',
+                dataType: 'text',
+                success: handleLogFetchSuccess,
+                error: handleLogFetchError
+            });
+        }
+
+        function handleLogFetchSuccess(data) {
+            if ($codeElement && $codeElement.length) {
+                if (data !== lastLogContent) {
+                    const highlightedData = LogHighlighter.highlightLog(data || 'No logs available.');
+                    // lineNumber ++;
+                    $codeElement.html(highlightedData);
+                    lastLogContent = data;
+                }
+            }
+        }
+
+        function handleLogFetchError(xhr, status, error) {
+            console.error('Log fetch error:', error);
+            if ($codeElement && $codeElement.length) {
+                $codeElement.text('Failed to load logs. Please make sure Kopycat is running.');
+            }
+        }
+
+        return { init };
+    })();
+
+    LogDisplay.init();
+});
+
+$(document).ready(function(){
+    // Main tab switching
+    $('.main-tabs button').click(function(){
+        const tabId = $(this).data('main-tab');
+        $('.main-tab-content').removeClass('active');
+        $('#' + tabId).addClass('active');
+        $('.main-tabs button').removeClass('active-main-tab');
+        $(this).addClass('active-main-tab');
     });
 
-    // Set initial active tab without animation
-    setActiveTab($('.tabs-menu button:first'), false);
-
-    // Adjust underline on window resize
-    $(window).resize(function() {
-        setActiveTab($('.tabs-menu button.active-tab'), false);
+    // Folder tab switching
+    $('.folder-tabs button').click(function(){
+        const tabId = $(this).data('folder-tab');
+        $('.folder-tab-content').removeClass('active');
+        $('#' + tabId).addClass('active');
+        $('.folder-tabs button').removeClass('active-folder-tab');
+        $(this).addClass('active-folder-tab');
     });
 });
 

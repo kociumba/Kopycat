@@ -89,6 +89,7 @@ func (s *GUIServer) Start() error {
 	s.mux.HandleFunc("/get-sync-targets", s.returnSyncTargets)
 	s.mux.HandleFunc("/get-current-interval", s.returnCurrentInterval)
 	s.mux.HandleFunc("/set-new-interval", s.setNewInterval)
+	s.mux.HandleFunc("/get-logs", s.getLogs)
 
 	// FOR PROFILING
 	// s.mux.HandleFunc("/debug/pprof/", pprof.Index)

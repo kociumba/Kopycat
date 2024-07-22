@@ -1,57 +1,48 @@
 <!DOCTYPE html>
-<lang="en">
+<html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="The web interface for Kopycat">
-        <meta name="author" content="kociumba">
-        <script src="https://unpkg.com/htmx.org@2.0.0"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-        <link rel="stylesheet" href="/static/styles.css">
-        <script defer src="/static/index.js"></script>
-        <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" /> -->
-        <!-- <script src="https://cdn.jsdelivr.net/npm/@formkit/auto-animate@0.8.2/index.min.js"></script> -->
-        <title>Kopycat</title>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The web interface for Kopycat">
+    <meta name="author" content="kociumba">
+    <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script defer src="/static/index.js"></script>
+    <script defer src="/static/syntaxHighlight.js"></script>
+    <title>Kopycat</title>
+</head>
 
-
-    <script>
-
-    </script>
-
-    <body>
-        <div class="container">
-            <header>
-                <h1>Kopycat Dashboard</h1>
-            </header>
-            <main>
-                <!-- <section class="status">
-                    <h2>Sync Status</h2>
-                    <p id="sync-status">Last synced: <span>2 minutes ago</span></p>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 75%;"></div>
-                    </div>
-                </section> -->
+<body>
+    <div class="container">
+        <header>
+            <h1>Kopycat Dashboard</h1>
+        </header>
+        <nav class="main-tabs">
+            <button data-main-tab="dashboard" class="active-main-tab">Dashboard</button>
+            <button data-main-tab="logs">Logs</button>
+        </nav>
+        <main>
+            <section id="dashboard" class="main-tab-content active">
                 <section class="folders">
                     <h2>Synced Folders</h2>
-                    <div class="tabs-menu">
-                        <button data-tab="tab1" class="active-tab">Manual Config</button>
-                        <button data-tab="tab2">Mirror on Drive</button>
-                        <div class="tab-underline"></div>
+                    <div class="folder-tabs">
+                        <button data-folder-tab="tab1" class="active-folder-tab">Manual Config</button>
+                        <button data-folder-tab="tab2">Mirror on Drive</button>
                     </div>
-                    
-                    <!-- manual destination config -->
-                    <div id="tab1" class="tab active">
+
+                    <div id="tab1" class="folder-tab-content active">
+                        <!-- Manual config content -->
                         <label for="originPath1">Enter Origin Folder Path:</label>
                         <input type="text" id="originPath1" placeholder="root/users/username/origin">
                         <label for="destinationPath1">Enter Destination Folder Path:</label>
                         <input type="text" id="destinationPath1" placeholder="root/users/username/destination">
                         <a class="button" onclick="submitFiles()">Update Sync</a>
                     </div>
-                    
-                    <!-- auto mirroring on other drives -->
-                    <div id="tab2" class="tab">
+
+                    <div id="tab2" class="folder-tab-content">
+                        <!-- Mirror on Drive content -->
                         <label for="originPath2">Enter Origin Folder Path:</label>
                         <input type="text" id="originPath2" placeholder="root/users/username/origin">
                         <label for="drives-list">Pick the drive to sync to with the same directory structure:</label>
@@ -60,17 +51,15 @@
                         </div>
                         <a class="button" onclick="submitFiles()">Update Sync</a>
                     </div>
-                    
+
                     <h2>Manage Sync Targets</h2>
-                    <!-- <div id="targets-container" hx-get="/get-sync-targets" hx-trigger="load click submitFiles"
-                        hx-target="#targets-container"> -->
                     <div id="targets-container" hx-get="/get-sync-targets" hx-trigger="every 1s"
                         hx-target="#targets-container">
-                        <!-- Target items will be dynamically added here -->
                         <div class="loading-placeholder"></div>
                     </div>
                 </section>
                 <section class="settings">
+                    <!-- Settings content -->
                     <h2>Settings</h2>
                     <label>
                         <div id="current-interval" hx-get="/get-current-interval" hx-trigger="every 1s"
@@ -86,9 +75,17 @@
                         </select>
                     </label>
                 </section>
-            </main>
-            <footer>
-                <p>&copy; 2024 Kopycat</p>
-            </footer>
-        </div>
-    </body>
+            </section>
+
+            <section id="logs" class="main-tab-content">
+                <h2>Kopycat Logs</h2>
+                <div id="log-section"></div>
+            </section>
+        </main>
+        <footer>
+            <p>&copy; 2024 Kopycat</p>
+        </footer>
+    </div>
+</body>
+
+</html>

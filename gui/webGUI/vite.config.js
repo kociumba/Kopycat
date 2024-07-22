@@ -2,6 +2,6 @@
 export default {
     root: '.',
     server: {
-        open: '/',
+        // open: '/',
     }
 }
