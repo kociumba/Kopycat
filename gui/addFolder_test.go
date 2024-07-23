@@ -2,6 +2,7 @@ package gui
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -21,7 +22,7 @@ func Test_mirrorStructure(t *testing.T) {
 				origin:            `C:\Users\user\gabagool`,
 				destinationVolume: `D:\`,
 			},
-			want: filepath.Clean(filepath.ToSlash("D:/Users/user/gabagool")),
+			want: strings.Trim(filepath.Clean(filepath.ToSlash("D:/Users/user/gabagool")), "\n"),
 		},
 		{
 			name: "Test with not fucked up separators",
@@ -29,7 +30,7 @@ func Test_mirrorStructure(t *testing.T) {
 				origin:            "C:/Users/user/gabagool",
 				destinationVolume: "D:/",
 			},
-			want: filepath.Clean(filepath.ToSlash("D:/Users/user/gabagool")),
+			want: strings.Trim(filepath.Clean(filepath.ToSlash("D:/Users/user/gabagool")), "\n"),
 		},
 	}
 	for _, tt := range tests {
