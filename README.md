@@ -79,9 +79,9 @@ This isn't a complete list by any means, but it should serve as a baseline of wh
 ## Final notes
 
 At the moment, the web GUI won't function without an internet connection as it uses [HTMX](https://htmx.org/) 
-and [jQuery](https://jquery.com/) to function properly.
+and [jQuery](https://jquery.com/).
 
-This was a short sighted decision that made the development much easier.
+I used this to make development much faster and easier.
 
 The rest of the app remains functional.
 The only caveat being you would have to configure it by sending manual server requests or edit the `config/config.json` file.

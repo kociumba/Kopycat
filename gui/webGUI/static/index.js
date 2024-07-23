@@ -20,19 +20,16 @@ $(document).ready(function(){
 
 let selectedFolderPath = '';
 
+// The new submiter needs to be this couse of the tabs 
 function submitFiles() {
-    var originPath = $('#originPath').val();
-    var destinationPath = $('#destinationPath').val();
-    // var checkedDrive = $('input[name="drives-option"]:checked').val();
-
+    // Find the active tab
+    var activeTab = $('.folder-tab-content.active');
+    
+    // Get the input values from the active tab
+    var originPath = activeTab.find('input[id^="originPath"]').val();
+    var destinationPath = activeTab.find('input[id^="destinationPath"]').val();
+    
     console.log('File Path:', "originPath: ", originPath, ", destinationPath: ", destinationPath);
-    // console.log('Checked Drive:', checkedDrive);
-
-    // if (!checkedDrive) {
-    //     console.error('No drive selected', checkedDrive);
-    //     alert('Please select a drive.');
-    //     return;
-    // }
 
     if (!originPath) {
         console.error('No origin path entered');
@@ -40,6 +37,22 @@ function submitFiles() {
         return;
     }
 
+    // Check if we're in the "Mirror on Drive" tab
+    if (activeTab.attr('id') === 'tab2') {
+        var checkedDrive = activeTab.find('input[name="drives-option"]:checked').val();
+        console.log('Checked Drive:', checkedDrive);
+
+        if (!checkedDrive) {
+            console.error('No drive selected');
+            alert('Please select a drive.');
+            return;
+        }
+
+        // Use the checked drive as the destination path
+        destinationPath = checkedDrive;
+    }
+
+    // Call the addfolder function with the gathered information
     addfolder(originPath, destinationPath);
 }
 

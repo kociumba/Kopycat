@@ -5,8 +5,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/kociumba/kopycat/config"
+	"github.com/kociumba/kopycat/handlers"
 	l "github.com/kociumba/kopycat/logger"
 	"github.com/kociumba/kopycat/syncer"
 	"github.com/kociumba/kopycat/tasks"
@@ -81,6 +83,27 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if destination is a volume name
+	volumes, err := handlers.GetSystemDrives()
+	if err != nil {
+		l.Clog.Error("Error getting system drives", "error", err)
+		http.Error(w, "Error getting system drives", http.StatusInternalServerError)
+		return
+	}
+	for _, volume := range volumes {
+		if req.Destination == volume {
+			l.Clog.Info("Destination is a volume name", "path", req.Destination)
+			req.Destination = mirrorStructure(req.Origin, req.Destination)
+			break
+		}
+	}
+
+	if req.Origin == req.Destination {
+		l.Clog.Error("Origin and destination are the same", "origin", req.Origin, "destination", req.Destination)
+		http.Error(w, "Origin and destination are the same", http.StatusBadRequest)
+		return
+	}
+
 	// Add the folder to sync
 	config.ServerConfig.AddToSync(req.Origin, req.Destination, hash)
 	// config.ServerConfig.SaveConfig()
@@ -99,4 +122,23 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 		l.Clog.Error("Error encoding response", "error", err)
 		http.Error(w, "Error encoding response", http.StatusInternalServerError)
 	}
+}
+
+// returns the mirrored pathwith / on unix and \ on windows
+func mirrorStructure(origin, destinationVolume string) string {
+	originVolume := filepath.VolumeName(origin)
+
+	if originVolume == "" {
+		return origin
+	}
+
+	parts := strings.Split(filepath.ToSlash(origin), "/")
+	for i, part := range parts {
+		if part == originVolume {
+			parts[i] = destinationVolume
+			break
+		}
+	}
+
+	return filepath.Clean(filepath.ToSlash((strings.Join(parts, "/"))))
 }
