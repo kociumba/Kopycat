@@ -128,6 +128,8 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 func mirrorStructure(origin, destinationVolume string) string {
 	originVolume := filepath.VolumeName(origin)
 
+	// l.Clog.Info("the found volume", "volume", originVolume)
+
 	if originVolume == "" {
 		return origin
 	}
