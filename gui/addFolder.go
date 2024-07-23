@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/kociumba/kopycat/config"
@@ -90,12 +91,18 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error getting system drives", http.StatusInternalServerError)
 		return
 	}
-	for _, volume := range volumes {
-		if req.Destination == volume {
-			l.Clog.Info("Destination is a volume name", "path", req.Destination)
-			req.Destination = mirrorStructure(req.Origin, req.Destination)
-			break
+	if runtime.GOOS == "windows" {
+		for _, volume := range volumes {
+			if req.Destination == volume {
+				l.Clog.Info("Destination is a volume name", "path", req.Destination)
+				req.Destination = mirrorStructure(req.Origin, req.Destination)
+				break
+			}
 		}
+	} else {
+		l.Clog.Error("Volume mirroring is currently only supported on windows", "error", err)
+		http.Error(w, "Volume mirroring is currently only supported on windows", http.StatusInternalServerError)
+		return
 	}
 
 	if req.Origin == req.Destination {
@@ -126,6 +133,7 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 
 // returns the mirrored pathwith / on unix and \ on windows
 func mirrorStructure(origin, destinationVolume string) string {
+
 	originVolume := filepath.VolumeName(origin)
 
 	// l.Clog.Info("the found volume", "volume", originVolume)
