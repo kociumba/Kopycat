@@ -12,6 +12,9 @@ $(() => {
     observers.observeSyncInterval();
 });
 
+/**
+ * Provides all the functions to save and load state
+ */
 const storageHandler = (() => {
     function saveActiveMainTab(activeMainTab) {
         localStorage.setItem('activeMainTab', activeMainTab);
@@ -75,6 +78,9 @@ const storageHandler = (() => {
     };
 })();
 
+/**
+ * All the observers for checking state changes
+ */
 const observers = (() => {
     function observeActiveMainTab() {
         $('.main-tabs').on('click', 'button', (event) => {

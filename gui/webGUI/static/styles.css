@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
+@import url('https://fonts.cdnfonts.com/css/cascadia-code');
 
 :root {
     --radius: 0.5rem;
@@ -13,6 +14,10 @@
 *::selection {
     background-color: var(--primary-color);
     color: var(--bg-color);
+}
+
+*:not(#logs-hosted) {
+    font-family: Poppins;
 }
 
 .loading-placeholder {
@@ -198,7 +203,8 @@ ul li {
     display: flex;
     position: relative;
     border-bottom: 2px solid var(--card-bg-color);
-    margin-bottom: 0; /* Remove margin-bottom */
+    margin-bottom: 0;
+    /* Remove margin-bottom */
 }
 
 .tabs-menu button {
@@ -259,7 +265,8 @@ ul li {
     height: 2px;
     background: var(--primary-color);
     transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
-    width: 0; /* Start with zero width */
+    width: 0;
+    /* Start with zero width */
 }
 
 .tab-underline.active {
@@ -269,7 +276,7 @@ ul li {
 .main-tabs {
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    margin: 20px;
 }
 
 .main-tabs button {
@@ -339,9 +346,17 @@ ul li {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 } */
 
-#logs-hosted {
-    font-family: 'Courier New', Courier, monospace;
+#logs-hosted,
+.language-log 
+.date,
+.level-info,
+.module,
+.message {
+    font-family: 'Cascadia Code', sans-serif !important;
     font-size: 14px;
+}
+
+#logs-hosted {
     line-height: 1.5;
     color: var(--text-color);
     background-color: var(--bg-color);
@@ -361,30 +376,75 @@ ul li {
 }
 
 /* Log syntax highlighting */
-.language-log .date { color: #ee9997; }
-.language-log .date::selection { color: var(--bg-color); background-color: #ee9997; }
+.language-log .date {
+    color: #ee9997;
+}
 
-.language-log .time { color: #ee9997; }
-.language-log .time::selection { color: var(--bg-color); background-color: #ee9997; }
+.language-log .date::selection {
+    color: var(--bg-color);
+    background-color: #ee9997;
+}
 
-.language-log .level-info { color: #5fffd7; }
-.language-log .level-info::selection { color: var(--bg-color); background-color: #5fffd7; }
+.language-log .time {
+    color: #ee9997;
+}
 
-.language-log .level-warn { color: #ffd207; }
-.language-log .level-warn::selection { color: var(--bg-color); background-color: #ffd207; }
+.language-log .time::selection {
+    color: var(--bg-color);
+    background-color: #ee9997;
+}
 
-.language-log .level-error { color: #dc3545; }
-.language-log .level-error::selection { color: var(--bg-color); background-color: #dc3545; }
+.language-log .level-info {
+    color: #5fffd7;
+}
 
-.language-log .level-debug { color: #690dc0; }
-.language-log .level-debug::selection { color: var(--text-color); background-color: #690dc0; }
+.language-log .level-info::selection {
+    color: var(--bg-color);
+    background-color: #5fffd7;
+}
 
-.language-log .module { color: #696969; }
-.language-log .module::selection { color: var(--text-color); background-color: #696969; }
+.language-log .level-warn {
+    color: #ffd207;
+}
 
-.language-log .message { color: var(--text-color); }
-.language-log .message::selection { 
-    color: var(--bg-color); 
+.language-log .level-warn::selection {
+    color: var(--bg-color);
+    background-color: #ffd207;
+}
+
+.language-log .level-error {
+    color: #dc3545;
+}
+
+.language-log .level-error::selection {
+    color: var(--bg-color);
+    background-color: #dc3545;
+}
+
+.language-log .level-debug {
+    color: #690dc0;
+}
+
+.language-log .level-debug::selection {
+    color: var(--text-color);
+    background-color: #690dc0;
+}
+
+.language-log .module {
+    color: #696969;
+}
+
+.language-log .module::selection {
+    color: var(--text-color);
+    background-color: #696969;
+}
+
+.language-log .message {
+    color: var(--text-color);
+}
+
+.language-log .message::selection {
+    color: var(--bg-color);
     background-color: var(--text-color);
 }
 
@@ -401,4 +461,143 @@ ul li {
 #logs-hosted::-webkit-scrollbar-track {
     background: var(--card-bg-color);
     border-radius: 5px;
+}
+
+.icon-info {
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    margin-left: 5px;
+    font-size: 1.2em;
+}
+
+.icon-info::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding: 5px;
+    border-radius: 5px;
+    border-color: var(--primary-color);
+    border-width: 2px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s;
+    font-size: 0.9em;
+    z-index: 1;
+}
+
+.icon-info:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--header-footer-bg);
+    transition: .4s;
+    border-radius: 0.8rem;
+    border-color: var(--primary-color);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: var(--text-color);
+    transition: .4s;
+    border-radius: 0.8rem;
+}
+
+input:checked+.slider {
+    background-color: var(--primary-color);
+}
+
+input:checked+.slider:before {
+    transform: translateX(26px);
+}
+
+.slider-text {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100px;
+    text-align: center;
+    transition: .4s;
+    font-size: 14px;
+}
+
+.slider-text::after {
+    content: attr(data-off);
+    position: relative;
+    right: -50px;
+    color: var(--text-color);
+}
+
+input:checked+.slider .slider-text::after {
+    content: attr(data-on);
+    color: var(--primary-color);
+}
+
+.icon-info {
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    margin-left: 5px;
+    font-size: 1.2em;
+    vertical-align: middle; /* Aligns the icon with the text */
+}
+
+.icon-info svg {
+    width: 1em; /* Adjust the width to match the font size */
+    height: 1em; /* Adjust the height to match the font size */
+    /* vertical-align: middle; */
+}
+
+.icon-info::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s;
+    font-size: 0.9em;
+    z-index: 1;
+}
+
+.icon-info:hover::after {
+    opacity: 1;
+    visibility: visible;
 }

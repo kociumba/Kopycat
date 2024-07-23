@@ -13,6 +13,7 @@
     <script defer src="/static/syntaxHighlight.js"></script>
     <script defer src="/static/logHandler.js"></script>
     <script defer src="/static/handleLocalStorage.js"></script>
+    <script defer src="/static/gayToggle.js"></script>
     <title>Kopycat</title>
 </head>
 
@@ -20,15 +21,41 @@
     <div class="container">
         <header>
             <h1>Kopycat Dashboard</h1>
+            <nav class="main-tabs">
+                <button data-main-tab="dashboard" class="active-main-tab">Dashboard</button>
+                <button data-main-tab="logs">Logs</button>
+            </nav>
         </header>
-        <nav class="main-tabs">
-            <button data-main-tab="dashboard" class="active-main-tab">Dashboard</button>
-            <button data-main-tab="logs">Logs</button>
-        </nav>
+
         <main>
             <section id="dashboard" class="main-tab-content active">
                 <section class="folders">
                     <h2>Synced Folders</h2>
+
+                    <!-- Don't display the toggle for now -->
+                    <label class="switch" style="display: none;">
+                        <input type="checkbox" id="gay-toggle">
+                        <span class="slider">
+                            <span class="slider-text" data-on="Gay Mode" data-off="Standard Theme"></span>
+                        </span>
+                    </label>
+
+                    <p class="disclaimer">
+                        <strong>Important:</strong> If you just want to mirror a folder structure onto another drive,
+                        please use the "Mirror on Drive" tab below.
+                        <span class="icon-info"
+                            data-tooltip="Kopycat always trys to mirror the folder structure of the origin folder onto the destination folder if provided with just a root or disk volume.">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                                <path d="M12 9h.01" />
+                                <path d="M11 12h1v4h1" />
+                            </svg>
+                        </span>
+                    </p>
                     <div class="folder-tabs">
                         <button data-folder-tab="tab1" class="active-folder-tab">Manual Config</button>
                         <button data-folder-tab="tab2">Mirror on Drive</button>
@@ -78,14 +105,16 @@
                     </label>
                 </section>
             </section>
-
             <section id="logs" class="main-tab-content">
                 <h2>Kopycat Logs</h2>
                 <div id="log-section"></div>
             </section>
         </main>
         <footer>
-            <p>&copy; 2024 Kopycat</p>
+            <!-- Funny little easter egg 😎 -->
+            <div id="gay-toggle" style="cursor: pointer;">
+                <p>&copy; 2024 Kopycat</p>
+            </div>
         </footer>
     </div>
 </body>
