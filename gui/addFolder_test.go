@@ -6,9 +6,12 @@ import (
 	"testing"
 
 	"github.com/charmbracelet/log"
+	"github.com/kociumba/kopycat/handlers"
 )
 
 func Test_mirrorStructure(t *testing.T) {
+	log.Info(handlers.GetSystemDrives())
+
 	type args struct {
 		origin            string
 		destinationVolume string
@@ -33,13 +36,13 @@ func Test_mirrorStructure(t *testing.T) {
 			name: "Test with not fucked up separators",
 			args: args{
 				origin:            "C:/Users/user/gabagool",
-				destinationVolume: `D:\`,
+				destinationVolume: "D:/",
 			},
 			want:          filepath.Clean("D:/Users/user/gabagool"),
 			onlyOnWindows: true,
 		},
 		{
-			name: "test with linux volume d",
+			name: "test with linux volume /mnt/d",
 			args: args{
 				origin:            "/home/user/gabagool",
 				destinationVolume: "/mnt/d",
@@ -48,12 +51,12 @@ func Test_mirrorStructure(t *testing.T) {
 			onlyOnLinux: true,
 		},
 		{
-			name: "test with linux volume e",
+			name: "test with linux volume /mnt/e",
 			args: args{
-				origin:            "/home/user/otherstuff",
+				origin:            "/home/user/gabagool",
 				destinationVolume: "/mnt/e",
 			},
-			want:        filepath.Clean("/mnt/e/home/user/otherstuff"),
+			want:        filepath.Clean("/mnt/e/home/user/gabagool"),
 			onlyOnLinux: true,
 		},
 	}
