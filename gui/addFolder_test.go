@@ -21,7 +21,7 @@ func Test_mirrorStructure(t *testing.T) {
 				origin:            `C:\Users\user\gabagool`,
 				destinationVolume: `D:\`,
 			},
-			want: filepath.Clean(`D:/Users/user/gabagool`),
+			want: filepath.Clean(filepath.ToSlash("D:/Users/user/gabagool")),
 		},
 		{
 			name: "Test with not fucked up separators",
@@ -29,7 +29,7 @@ func Test_mirrorStructure(t *testing.T) {
 				origin:            "C:/Users/user/gabagool",
 				destinationVolume: "D:/",
 			},
-			want: filepath.Clean(`D:/Users/user/gabagool`),
+			want: filepath.Clean(filepath.ToSlash("D:/Users/user/gabagool")),
 		},
 	}
 	for _, tt := range tests {
