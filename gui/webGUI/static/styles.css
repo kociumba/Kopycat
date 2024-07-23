@@ -361,11 +361,11 @@ ul li {
 }
 
 /* Log syntax highlighting */
-.language-log .date { color: #c93e84; }
-.language-log .date::selection { color: var(--text-color); background-color: #c93e84; }
+.language-log .date { color: #ee9997; }
+.language-log .date::selection { color: var(--bg-color); background-color: #ee9997; }
 
-.language-log .time { color: #c93e84; }
-.language-log .time::selection { color: var(--text-color); background-color: #c93e84; }
+.language-log .time { color: #ee9997; }
+.language-log .time::selection { color: var(--bg-color); background-color: #ee9997; }
 
 .language-log .level-info { color: #5fffd7; }
 .language-log .level-info::selection { color: var(--bg-color); background-color: #5fffd7; }
