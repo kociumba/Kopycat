@@ -1,0 +1,43 @@
+name: main
+
+# This workflow takes place of tests.yml and release.yml
+# This is essentially the same but written as a parallel job for each system to test where tests pass
+
+on:
+    push:
+      branches: [ "main" ] # Triggers on pushes to main
+      tags: [ "v*" ] # Triggers on any tag with the prefix 'v'
+    pull_request:
+      branches: [ "main" ] # Triggers on pull requests
+
+jobs:
+  test:
+    runs-on: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+            submodules: true
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.22.5
+
+      - name: Set up gotestfmt
+        uses: GoTestTools/gotestfmt-action@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run go test
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test -json -p 1 -v ./... 2>&1 | tee $RUNNER_TEMP/gotest.log
+  
+      - name: Format log output
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat $RUNNER_TEMP/gotest.log | gotestfmt
