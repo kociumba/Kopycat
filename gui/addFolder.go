@@ -95,7 +95,7 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 		for _, volume := range volumes {
 			if req.Destination == volume {
 				l.Clog.Info("Destination is a volume name", "path", req.Destination)
-				req.Destination = mirrorStructure(req.Origin, req.Destination)
+				req.Destination = MirrorStructure(req.Origin, req.Destination)
 				break
 			}
 		}
@@ -132,7 +132,7 @@ func (s *GUIServer) handleAddFolder(w http.ResponseWriter, r *http.Request) {
 }
 
 // returns the mirrored pathwith / on unix and \ on windows
-func mirrorStructure(origin, destinationVolume string) string {
+func MirrorStructure(origin, destinationVolume string) string {
 
 	originVolume := filepath.VolumeName(origin)
 

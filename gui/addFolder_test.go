@@ -9,7 +9,7 @@ import (
 	"github.com/kociumba/kopycat/handlers"
 )
 
-func Test_mirrorStructure(t *testing.T) {
+func Test_MirrorStructure(t *testing.T) {
 	log.Info(handlers.GetSystemDrives())
 
 	type args struct {
@@ -70,7 +70,7 @@ func Test_mirrorStructure(t *testing.T) {
 
 			log.Info("found volume", "volume", filepath.VolumeName(tt.args.origin))
 
-			if got := mirrorStructure(tt.args.origin, tt.args.destinationVolume); got != tt.want {
+			if got := MirrorStructure(tt.args.origin, tt.args.destinationVolume); got != tt.want {
 				t.Errorf("mirrorStructure() = %v, want %v", got, tt.want)
 			}
 		})
