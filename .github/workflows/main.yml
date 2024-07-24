@@ -9,10 +9,18 @@ on:
       tags: [ "v*" ] # Triggers on any tag with the prefix 'v'
     pull_request:
       branches: [ "main" ] # Triggers on pull requests
+# Create a strategy matrix and define the runner systems there
 
 jobs:
-  test:
-    runs-on: [ ubuntu-latest, windows-latest, macos-latest ]
+  testAndBuild:
+    strategy:
+      matrix:
+        testAndBuild: [ 
+            {name: linux, os: ubuntu-latest,},
+            {name: windows, os: windows-latest,},
+            {name: macos, os: macos-latest },
+            ]
+    runs-on: ${{ matrix.testAndBuild.os }}
 
     steps:
       - name: Checkout
@@ -41,3 +49,44 @@ jobs:
         run: |
           set -euo pipefail
           cat $RUNNER_TEMP/gotest.log | gotestfmt
+
+      - name: Generate resource files
+        if: matrix.testAndBuild.name == 'windows'
+        run: |
+          go run github.com/tc-hib/go-winres@latest make
+
+      - name: Build
+        run: |
+          go build -C . -o ./bin/kopycat-${{ matrix.testAndBuild.name }} -ldflags "-s -w" 
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: kopycat-${{ matrix.testAndBuild.name }}
+          path: ./bin/kopycat-${{ matrix.testAndBuild.name }}
+
+  collectArtifacts:
+    needs: testAndBuild
+    runs-on: ubuntu-latest
+    steps:
+    #   - name: Checkout
+    #     uses: actions/checkout@v3
+        
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: kopycat-*
+          path: ./artifacts/
+        
+      - name: Release asset
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/kopycat*
+          generate_release_notes: true
