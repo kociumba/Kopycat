@@ -26,3 +26,4 @@ go.work
 /bin/config
 /bin/linux
 /gui/webGUI/dashboard_old.html
+/test results

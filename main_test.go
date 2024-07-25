@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -61,7 +62,15 @@ func Test_main(t *testing.T) {
 			// make sure origin is there couse this will fail if origin does not exist
 			err := os.MkdirAll(tt.origin, os.ModePerm)
 			if err != nil {
-				t.Fatal(err)
+				t.Fatalf("Failed to create origin dir %v", err)
+				printLog()
+			}
+
+			if originInfo, err := os.Stat(tt.origin); err != nil {
+				t.Fatalf("Failed to get stat for origin %v", err)
+				printLog()
+			} else {
+				log.Infof("Origin info: %v", originInfo)
 			}
 
 			req := gui.AddFolderRequest{
@@ -70,27 +79,46 @@ func Test_main(t *testing.T) {
 			}
 			jsonReq, err := json.Marshal(req)
 			if err != nil {
-				t.Fatal(err)
+				t.Fatalf("Failed to marshal request %v", err)
+				printLog()
 			}
 			resp, err := http.Post("http://localhost:42069/add-folder", "application/json", bytes.NewReader(jsonReq))
 			if err != nil {
-				t.Fatal(err)
+				t.Fatalf("Failed to add folder %v", err)
+				printLog()
 			}
 			defer resp.Body.Close()
 
-			log.Info(resp)
+			log.Infof("Response: %v", resp)
 
-			_, err = os.Stat(tt.destination)
+			destInfo, err := os.Stat(tt.destination)
 			if err != nil {
-				t.Fatal(err)
+				t.Fatalf("Destination was not created %v", err)
+				printLog()
+			}
+
+			log.Infof("Destination info: %v", destInfo)
+
+			if !destInfo.IsDir() {
+				t.Fatalf("Destination was not created as a directory")
+				printLog()
 			}
 
 			mockStop(t)
 
 			log.Info("test done")
 
-			log.Error(os.RemoveAll(tt.origin))
-			log.Error(os.RemoveAll(tt.destination))
+			err = os.RemoveAll(tt.origin)
+			if err != nil {
+				t.Fatalf("Failed to remove origin dir %v", err)
+				printLog()
+			}
+
+			err = os.RemoveAll(tt.destination)
+			if err != nil {
+				t.Fatalf("Failed to remove destination dir %v", err)
+				printLog()
+			}
 		})
 	}
 }
@@ -164,4 +192,9 @@ func mockStop(t *testing.T) {
 	}
 
 	t.Log("stop done")
+}
+
+func printLog() {
+	logSetup.MutexLog.Seek(0, io.SeekStart)
+	log.Info(logSetup.MutexLog.ReadIntoBuffer())
 }
